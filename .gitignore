@@ -127,3 +127,5 @@ sketch
 
 # Data folder
 data/
+
+*.png
