@@ -29,7 +29,9 @@ const isLoggedIn = async () => {
     return !page.url().includes(CODEFORCES_LOGIN_PAGE_URL);
 }
 
+let username = null;
 const openSessionForUser = async (user, pass) => {
+    username = user;
     await startBrowser();
     await page.goto(CODEFORCES_LOGIN_PAGE_URL);
     await page.click(USERNAME_SELECTOR);
@@ -45,6 +47,7 @@ const openSessionForUser = async (user, pass) => {
 const closeRunningSession = async () => {
     if (browser === null)
         return;
+    username = null;
     await closeBrowser();
 }
 
@@ -101,9 +104,23 @@ const getAvailableLanguages = async (contestId) => {
     }
 }
 
+const getUserSubmissions = async () => {
+    return new Promise((resolve, reject) => {
+        const url = `http://codeforces.com/api/user.status?handle=${username}&from=1&count=50`;
+        page.on('response', async response => {
+            if (response.url() === url) {
+                const submissions = (await response.json()).result;
+                resolve(submissions);
+            }
+        });
+        page.goto(url);
+    });
+}
+
 module.exports = {
     openSessionForUser,
     closeRunningSession,
     submitProblem,
-    getAvailableLanguages
+    getAvailableLanguages,
+    getUserSubmissions
 };
