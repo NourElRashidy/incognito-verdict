@@ -1,7 +1,4 @@
 const puppeteer = require('puppeteer');
-const cheerio = require('cheerio');
-const chalk = require('chalk');
-const fs = require('fs');
 
 let browser = null;
 let page = null;
@@ -84,8 +81,29 @@ const submitProblem = async (contestId, problemId, languageId, sourceCode) => {
     }
 }
 
+const getAvailableLanguages = async (contestId) => {
+    try {
+        await page.goto(`https://codeforces.com/gym/${contestId}/submit`);
+        const languages = await page.evaluate(optionSelector => {
+            return Array.from(document.querySelectorAll(optionSelector))
+                .filter(o => o.value)
+                .map(o => {
+                    return {
+                        name: o.text,
+                        value: o.value
+                    };
+                });
+        }, `${LANGUAGE_DROPDOWN_SELECTOR} > option`);
+        return languages;
+    }
+    catch (e) {
+        throw new Error('Failed to retrieve languages!\n' + e);
+    }
+}
+
 module.exports = {
     openSessionForUser,
     closeRunningSession,
-    submitProblem
+    submitProblem,
+    getAvailableLanguages
 };
