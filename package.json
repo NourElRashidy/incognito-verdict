@@ -1,0 +1,55 @@
+{
+  "name": "incognito_verdict",
+  "version": "1.0.0",
+  "description": "A tool to submit problems and get verdicts without failed or running test number, CPC style.",
+  "main": "app/main.js",
+  "build": {
+    "appId": "incognito_verdict",
+    "mac": {
+      "category": "incognito_verdict.app"
+    }
+  },
+  "scripts": {
+    "dev": "webpack --watch",
+    "start": "electron .",
+    "build": "webpack && electron-builder",
+    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
+    "package-win": "electron-packager . incognito_verdict --overwrite --platform=win32 --arch=ia32 --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"incognito_verdict\" --icon=data/assets/icons/icon.ico",
+    "package-linux": "electron-packager . incognito_verdict --overwrite --asar=true --platform=linux --arch=x64 --prune=true --out=release-builds --icon=data/assets/icons/icon.png"
+  },
+  "author": "Nour Elrashidy",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.8.3",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/preset-env": "^7.8.3",
+    "@babel/preset-react": "^7.8.3",
+    "@hot-loader/react-dom": "16.8.2",
+    "babel": "^6.23.0",
+    "babel-core": "7.0.0-bridge.0",
+    "babel-loader": "^8.0.6",
+    "css-loader": "^2.1.0",
+    "electron": "^3.1.6",
+    "electron-builder": "^20.44.4",
+    "electron-packager": "^14.0.0",
+    "file-loader": "^6.0.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-hot-loader": "^4.11.1",
+    "react-router-dom": "^4.3.1",
+    "react-select": "^3.0.4",
+    "reactn": "^1.0.0",
+    "style-loader": "^0.23.1",
+    "url-loader": "^4.0.0",
+    "webpack": "^4.35.0",
+    "webpack-cli": "^3.2.3",
+    "webpack-dev-server": "^3.1.14",
+    "yarn": "^1.13.0"
+  },
+  "dependencies": {
+    "@material-ui/core": "^4.1.2",
+    "cheerio": "^1.0.0-rc.3",
+    "moment": "^2.24.0"
+  }
+}
