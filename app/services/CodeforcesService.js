@@ -65,10 +65,33 @@ const SOURCE_CODE_SELECTOR = '#editor > div.ace_scroller > div > div.ace_layer.a
 const SUBMIT_BUTTON_SELECTOR = '#pageContent > form > table > tbody > tr:nth-child(6) > td > div > div > input';
 const SUBMIT_ERROR_SELECTOR = '#pageContent > form > table > tbody > tr:nth-child(5) > td:nth-child(2) > div > span';
 
-const submitProblem = async (contestId, problemId, languageId, sourceCode) => {
+const getSubmitUrl = async (url) => {
+    let res = url.match('https://codeforces.com/problemset/problem/(.*)/(.*)');
+
+    if (res)
+        return `https://codeforces.com/contest/${res[1]}/submit/${res[2]}`;
+
+    res = url.match('https://codeforces.com/contest/(.*)/problem/(.*)');
+    if (res)
+        return `https://codeforces.com/contest/${res[1]}/submit/${res[2]}`;
+
+    res = url.match('https://codeforces.com/gym/(.*)/problem/(.*)');
+    if (res)
+        return `https://codeforces.com/gym/${res[1]}/submit/${res[2]}`;
+
+    throw ('invalid problem url!')
+}
+
+const submitProblem = async (url, languageId, sourceCode) => {
     console.log('Submitting...');
     try {
-        await page.goto(`https://codeforces.com/gym/${contestId}/submit/${problemId}`);
+        try {
+            await page.goto(await getSubmitUrl(url));
+        }
+        catch (e) {
+            return e;
+        }
+
         await page.select(LANGUAGE_DROPDOWN_SELECTOR, languageId);
         await page.click(SOURCE_CODE_SELECTOR);
         await page.keyboard.type(sourceCode);
