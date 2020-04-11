@@ -20,13 +20,22 @@ const USERNAME_SELECTOR = '#handleOrEmail';
 const PASSWORD_SELECTOR = '#password';
 const REMEMBER_SELECTOR = '#remember';
 const LOGIN_BUTTON_SELECTOR = '#enterForm > table > tbody > tr:nth-child(4) > td > div:nth-child(1) > input';
+const LOGIN_ERROR_SELECTOR = '#enterForm > table > tbody > tr.subscription-row > td:nth-child(2) > div > span';
 
 const isLoggedIn = async () => {
     if (browser === null || page === null)
         return false;
 
-    await page.goto(CODEFORCES_LOGIN_PAGE_URL);
-    return !page.url().includes(CODEFORCES_LOGIN_PAGE_URL);
+    try {
+        let element = await page.$(LOGIN_ERROR_SELECTOR);
+        return await page.evaluate(element => element.textContent, element);
+    }
+    catch (e) {
+        await page.goto(CODEFORCES_LOGIN_PAGE_URL);
+        if (!page.url().includes(CODEFORCES_LOGIN_PAGE_URL))
+            return true;
+        return false;
+    }
 }
 
 let username = null;
@@ -53,7 +62,8 @@ const closeRunningSession = async () => {
 
 const LANGUAGE_DROPDOWN_SELECTOR = '#pageContent > form > table > tbody > tr:nth-child(3) > td:nth-child(2) > select';
 const SOURCE_CODE_SELECTOR = '#editor > div.ace_scroller > div > div.ace_layer.ace_text-layer > div';
-const SUBMIT_BUTTON = '#pageContent > form > table > tbody > tr:nth-child(6) > td > div > div > input';
+const SUBMIT_BUTTON_SELECTOR = '#pageContent > form > table > tbody > tr:nth-child(6) > td > div > div > input';
+const SUBMIT_ERROR_SELECTOR = '#pageContent > form > table > tbody > tr:nth-child(5) > td:nth-child(2) > div > span';
 
 const submitProblem = async (contestId, problemId, languageId, sourceCode) => {
     console.log('Submitting...');
@@ -62,25 +72,25 @@ const submitProblem = async (contestId, problemId, languageId, sourceCode) => {
         await page.select(LANGUAGE_DROPDOWN_SELECTOR, languageId);
         await page.click(SOURCE_CODE_SELECTOR);
         await page.keyboard.type(sourceCode);
-        await page.click(SUBMIT_BUTTON);
+        await page.click(SUBMIT_BUTTON_SELECTOR);
     }
     catch (e) {
         throw new Error('Failed to submit!\n' + e);
     }
 
     if (page.url().includes('/my')) {
-        console.log('submitted successfully!');
-        return;
+        console.log('Submitted successfuly...');
+        return true;
     }
 
     // Check if submission is rejected due to repeated submissions
     try {
-        let element = await page.$('#pageContent > form > table > tbody > tr:nth-child(5) > td:nth-child(2) > div > span');
+        let element = await page.$(SUBMIT_ERROR_SELECTOR);
         const err_text = await page.evaluate(element => element.textContent, element);
-        throw new Error(err_text);
+        return err_text;
     }
     catch (e) {
-        throw new Error('Failed to submit!\n' + e);
+        return false;
     }
 }
 

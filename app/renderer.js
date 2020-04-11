@@ -3,7 +3,18 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./containers/App";
 
-ReactDOM.render(
-  <App />,
-  document.getElementById("root")
-);
+function render(signedIn) {
+  ReactDOM.render(
+    <App signedIn={signedIn} />,
+    document.getElementById("root")
+  );
+}
+
+// ipcRenderer Listeners
+ipcRenderer.on('sign-in-successful', () => {
+  render(true);
+});
+
+
+// initialize
+render(false);

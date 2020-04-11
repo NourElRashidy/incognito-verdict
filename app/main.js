@@ -4,7 +4,7 @@ let mainWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 840,
+    width: 1040,
     height: 830,
     webPreferences: {
       nodeIntegration: true,
@@ -13,8 +13,8 @@ function createWindow() {
     resizable: true
   });
 
+  mainWindow.maximize();
   mainWindow.setMenuBarVisibility(false);
-
   mainWindow.loadFile('index.html');
   // mainWindow.webContents.openDevTools();
   mainWindow.on('closed', function () {
