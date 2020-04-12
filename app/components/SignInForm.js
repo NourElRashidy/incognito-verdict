@@ -1,14 +1,13 @@
 const { ipcRenderer, shell } = window.require('electron');
 import React, { useState } from 'react';
 
-import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Link from '@material-ui/core/Link';
 import Box from '@material-ui/core/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import LinearProgress from '@material-ui/core/LinearProgress';
+
 import { makeStyles } from '@material-ui/core/styles';
 
 function Disclaimer() {
@@ -56,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: '100%', // Fix IE 11 issue.
+    width: '100%',
     marginTop: theme.spacing(1),
   },
   submit: {
@@ -97,9 +96,6 @@ const SignInForm = () => {
 
   return (
     <div className={classes.paper}>
-      {/* <Avatar className={classes.avatar}>
-        <LockOutlinedIcon />
-      </Avatar> */}
       <Typography component="h1" variant="h5" color="textSecondary">
         Sign in to codeforces
       </Typography>
@@ -110,8 +106,8 @@ const SignInForm = () => {
           required
           error={fieldError && handleOrEmail === ''}
           fullWidth
-          id="handleOrEmail"
-          label="handle/email"
+          id="handle-or-email"
+          label="Handle/Email"
           name="handleOrEmail"
           autoFocus
           value={handleOrEmail}
@@ -125,7 +121,7 @@ const SignInForm = () => {
           error={fieldError && password === ''}
           fullWidth
           name="password"
-          label="password"
+          label="Password"
           type="password"
           id="password"
           value={password}

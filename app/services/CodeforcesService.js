@@ -1,19 +1,7 @@
-const puppeteer = require('puppeteer');
+const scraper = require('../engines/ScrapingEngine');
 
-let browser = null;
-let page = null;
 
-async function startBrowser() {
-    browser = await puppeteer.launch();
-    page = await browser.newPage();
-    page.setViewport({ width: 1366, height: 768 });
-}
-
-async function closeBrowser() {
-    await browser.close();
-    browser = null;
-    page = null;
-}
+let username = null;
 
 const CODEFORCES_LOGIN_PAGE_URL = 'https://codeforces.com/enter';
 const USERNAME_SELECTOR = '#handleOrEmail';
@@ -23,9 +11,10 @@ const LOGIN_BUTTON_SELECTOR = '#enterForm > table > tbody > tr:nth-child(4) > td
 const LOGIN_ERROR_SELECTOR = '#enterForm > table > tbody > tr.subscription-row > td:nth-child(2) > div > span';
 
 const isLoggedIn = async () => {
-    if (browser === null || page === null)
+    if (!scraper.isUp())
         return false;
 
+    const page = await scraper.getInstance();
     try {
         let element = await page.$(LOGIN_ERROR_SELECTOR);
         return await page.evaluate(element => element.textContent, element);
@@ -38,10 +27,9 @@ const isLoggedIn = async () => {
     }
 }
 
-let username = null;
 const openSessionForUser = async (user, pass) => {
     username = user;
-    await startBrowser();
+    const page = await scraper.getInstance();
     await page.goto(CODEFORCES_LOGIN_PAGE_URL);
     await page.click(USERNAME_SELECTOR);
     await page.keyboard.type(user);
@@ -54,10 +42,41 @@ const openSessionForUser = async (user, pass) => {
 }
 
 const closeRunningSession = async () => {
-    if (browser === null)
-        return;
+    scraper.endInstance();
     username = null;
-    await closeBrowser();
+}
+
+const parseUrl = async (url) => {
+    let urlInfo = url.match('https://codeforces.com/problemset/problem/(.*)/(.*)');
+    if (urlInfo)
+        return {
+            type: 'contest',
+            id: urlInfo[1],
+            letter: urlInfo[2]
+        };
+
+    urlInfo = url.match('https://codeforces.com/contest/(.*)/problem/(.*)');
+    if (urlInfo)
+        return {
+            type: 'contest',
+            id: urlInfo[1],
+            letter: urlInfo[2]
+        };
+
+    urlInfo = url.match('https://codeforces.com/gym/(.*)/problem/(.*)');
+    if (urlInfo)
+        return {
+            type: 'gym',
+            id: urlInfo[1],
+            letter: urlInfo[2]
+        };
+
+    throw ('invalid problem url!');
+}
+
+const getSubmitUrl = async (url) => {
+    let urlInfo = await parseUrl(url);
+    return `https://codeforces.com/${urlInfo.type}/${urlInfo.id}/submit/${urlInfo.letter}`;
 }
 
 const LANGUAGE_DROPDOWN_SELECTOR = '#pageContent > form > table > tbody > tr:nth-child(3) > td:nth-child(2) > select';
@@ -65,33 +84,16 @@ const SOURCE_CODE_SELECTOR = '#editor > div.ace_scroller > div > div.ace_layer.a
 const SUBMIT_BUTTON_SELECTOR = '#pageContent > form > table > tbody > tr:nth-child(6) > td > div > div > input';
 const SUBMIT_ERROR_SELECTOR = '#pageContent > form > table > tbody > tr:nth-child(5) > td:nth-child(2) > div > span';
 
-const getSubmitUrl = async (url) => {
-    let res = url.match('https://codeforces.com/problemset/problem/(.*)/(.*)');
-
-    if (res)
-        return `https://codeforces.com/contest/${res[1]}/submit/${res[2]}`;
-
-    res = url.match('https://codeforces.com/contest/(.*)/problem/(.*)');
-    if (res)
-        return `https://codeforces.com/contest/${res[1]}/submit/${res[2]}`;
-
-    res = url.match('https://codeforces.com/gym/(.*)/problem/(.*)');
-    if (res)
-        return `https://codeforces.com/gym/${res[1]}/submit/${res[2]}`;
-
-    throw ('invalid problem url!')
-}
-
 const submitProblem = async (url, languageId, sourceCode) => {
-    console.log('Submitting...');
+    const page = await scraper.getInstance();
     try {
         try {
             await page.goto(await getSubmitUrl(url));
         }
         catch (e) {
+            console.log(e);
             return e;
         }
-
         await page.select(LANGUAGE_DROPDOWN_SELECTOR, languageId);
         await page.click(SOURCE_CODE_SELECTOR);
         await page.keyboard.type(sourceCode);
@@ -117,20 +119,29 @@ const submitProblem = async (url, languageId, sourceCode) => {
     }
 }
 
-const getAvailableLanguages = async (contestId) => {
+const getAvailableLanguages = async (url) => {
     try {
-        await page.goto(`https://codeforces.com/gym/${contestId}/submit`);
-        const languages = await page.evaluate(optionSelector => {
-            return Array.from(document.querySelectorAll(optionSelector))
-                .filter(o => o.value)
-                .map(o => {
-                    return {
-                        name: o.text,
-                        value: o.value
-                    };
-                });
-        }, `${LANGUAGE_DROPDOWN_SELECTOR} > option`);
-        return languages;
+        try {
+            return await require('../engines/FilesEngine').loadLanguages();
+        }
+        catch (e) {
+            if (!url)
+                url = 'https://codeforces.com/contest/1332/problem/F'
+            const page = await scraper.getInstance();
+            await page.goto(url);
+            const languages = await page.evaluate(optionSelector => {
+                return Array.from(document.querySelectorAll(optionSelector))
+                    .filter(o => o.value)
+                    .map(o => {
+                        return {
+                            name: o.text,
+                            value: o.value
+                        };
+                    });
+            }, `${LANGUAGE_DROPDOWN_SELECTOR} > option`);
+            require('../engines/FilesEngine').saveLanguages(languages);
+            return languages;
+        }
     }
     catch (e) {
         throw new Error('Failed to retrieve languages!\n' + e);
@@ -138,12 +149,33 @@ const getAvailableLanguages = async (contestId) => {
 }
 
 const getUserSubmissions = async () => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         const url = `http://codeforces.com/api/user.status?handle=${username}&from=1&count=50`;
+        const page = await scraper.getInstance();
         page.on('response', async response => {
             if (response.url() === url) {
                 const submissions = (await response.json()).result;
                 resolve(submissions);
+            }
+        });
+        page.goto(url);
+    });
+}
+
+const getProblemName = async (url) => {
+    return new Promise(async (resolve, reject) => {
+        const urlInfo = await parseUrl(url);
+        url = `https://codeforces.com/api/contest.standings?contestId=${urlInfo.id}&from=1&count=1`;
+        const page = await scraper.getInstance();
+        page.on('response', async response => {
+            if (response.url() === url) {
+                try {
+                    const problem = (await response.json()).result.problems.filter(p => p.index === urlInfo.letter);
+                    resolve(`${problem[0].contestId} | ${problem[0].index} - ${problem[0].name}`);
+                }
+                catch (e) {
+                    reject(e);
+                }
             }
         });
         page.goto(url);
@@ -155,5 +187,6 @@ module.exports = {
     closeRunningSession,
     submitProblem,
     getAvailableLanguages,
-    getUserSubmissions
+    getUserSubmissions,
+    getProblemName
 };

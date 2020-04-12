@@ -126,6 +126,6 @@ sketch
 # End of https://www.gitignore.io/api/node,react
 
 # Data folder
-data/
+data/assets
 
 *.png
