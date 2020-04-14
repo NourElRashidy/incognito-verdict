@@ -51,3 +51,12 @@ ipcMain.on('submit-problem', async (event, { problemURL, selectedLanguage, sourc
         event.sender.send('submit-feedback', JSON.stringify(e, null, 4));
     }
 });
+
+ipcMain.on('get-user-submissions', async (event) => {
+    try {
+        event.sender.send('user-submissions', await codeforces.getUserSubmissions());
+    }
+    catch (e) {
+        event.sender.send('user-submissions');
+    }
+});

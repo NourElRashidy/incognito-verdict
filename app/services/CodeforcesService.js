@@ -154,11 +154,21 @@ const getUserSubmissions = async () => {
         const page = await scraper.getInstance();
         page.on('response', async response => {
             if (response.url() === url) {
-                const submissions = (await response.json()).result;
-                resolve(submissions);
+                try {
+                    const submissions = (await response.json()).result;
+                    resolve(submissions);
+                }
+                catch (e) {
+                    reject(e);
+                }
             }
         });
-        page.goto(url);
+        try {
+            page.goto(url);
+        }
+        catch (e) {
+            reject(e);
+        }
     });
 }
 
@@ -178,7 +188,12 @@ const getProblemName = async (url) => {
                 }
             }
         });
-        page.goto(url);
+        try {
+            page.goto(url);
+        }
+        catch (e) {
+            reject(e);
+        }
     });
 }
 

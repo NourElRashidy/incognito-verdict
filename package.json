@@ -49,6 +49,8 @@
   },
   "dependencies": {
     "@material-ui/core": "^4.9.9",
+    "@material-ui/lab": "^4.0.0-alpha.49",
+    "clsx": "^1.1.0",
     "moment": "^2.24.0",
     "puppeteer": "^2.1.1"
   }

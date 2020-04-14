@@ -1,7 +1,7 @@
 import React from "react";
 import { hot } from "react-hot-loader";
 import SignInPage from '../containers/SignInPage';
-import SubmitForm from '../components/SubmitForm';
+import SubmissionsList from '../components/SubmissionsList';
 import '../assets/baseline.css';
 
 function App({ signedIn }) {
@@ -13,7 +13,7 @@ function App({ signedIn }) {
       }
       {
         signedIn &&
-        <SubmitForm />
+        <SubmissionsList />
       }
     </>
   );

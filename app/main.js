@@ -18,6 +18,7 @@ function createWindow() {
   mainWindow.loadFile('index.html');
   // mainWindow.webContents.openDevTools();
   mainWindow.on('closed', function () {
+    require('./services/CodeforcesService').closeRunningSession();
     mainWindow = null;
   });
 }

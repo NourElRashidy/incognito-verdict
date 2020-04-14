@@ -16,6 +16,8 @@ module.exports = {
         return page;
     },
     endInstance: async () => {
+        if (!browser)
+            return;
         await browser.close();
         browser = null;
         page = null;
