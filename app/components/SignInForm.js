@@ -1,13 +1,7 @@
 const { ipcRenderer, shell } = window.require('electron');
 import React, { useState } from 'react';
 
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
-import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
-import LinearProgress from '@material-ui/core/LinearProgress';
-
+import { Box, Button, Link, TextField, Typography, LinearProgress } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 function Disclaimer() {
@@ -88,7 +82,7 @@ const SignInForm = () => {
     setIsLoading(true);
     setErrorMessage(null);
     ipcRenderer.send('sign-in', { handleOrEmail, password });
-    ipcRenderer.on('sign-in-failed', (_, message) => {
+    ipcRenderer.once('sign-in-failed', (_, message) => {
       setErrorMessage(message);
       setIsLoading(false);
     });
