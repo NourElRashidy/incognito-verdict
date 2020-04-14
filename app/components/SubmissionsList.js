@@ -2,8 +2,11 @@ const { ipcRenderer } = window.require('electron');
 const { dateTimeFromEpoch } = require('../services/Utils');
 import React, { useState, useEffect, useRef } from 'react';
 
-import { Card, CardMedia, CardActionArea, CardContent, Typography } from '@material-ui/core';
-import { Grid, Box, Divider } from '@material-ui/core';
+import {
+  Card, CardMedia, CardActionArea, CardContent,
+  Typography, Divider,
+  Grid, Box
+} from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 
 import cx from 'clsx';
@@ -14,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   paper: {
-    padding: theme.spacing(2),
+    padding: theme.spacing(1),
     textAlign: 'center',
     color: theme.palette.text.secondary,
   },
@@ -42,12 +45,12 @@ const useStyles = makeStyles((theme) => ({
   },
   emptyCard: {
     borderRadius: theme.spacing(1),
-    width: 300,
+    width: 270,
     height: 325
   },
   problemCard: {
     borderRadius: theme.spacing(1),
-    width: 300,
+    width: 270,
   },
   verdictCard: {
     display: 'block',
@@ -147,26 +150,34 @@ const SubmissionsList = () => {
 
   const classes = useStyles();
 
-  ipcRenderer.on('user-submissions', (_, submissions) => {
-    setPendingCount(submissions.filter(s => !s.verdict).length);
-    setSubmissions(submissions.map(s => {
-      return {
-        id: s.id,
-        problemName: `${s.problem.index} - ${s.problem.name}`,
-        verdict: verdictMapping(s.verdict),
-        timeConsumed: `${s.timeConsumedMillis}  ms`,
-        memoryConsumed: `${s.memoryConsumedBytes / 1024}  KB`,
-        dateTime: dateTimeFromEpoch(s.creationTimeSeconds)
+  const requstSubmissions = () => {
+    ipcRenderer.send('get-user-submissions');
+    ipcRenderer.once('user-submissions', (_, subs) => {
+      if (!subs) {
+        if ((!submissions || !submissions.length()) && !pendingCount) // avoid making redundant requests
+          requstSubmissions();
+        return;
       }
-    }));
-  });
+      setPendingCount(subs.filter(s => !s.verdict).length);
+      setSubmissions(subs.map(s => {
+        return {
+          id: s.id,
+          problemName: `${s.problem.index} - ${s.problem.name}`,
+          verdict: verdictMapping(s.verdict),
+          timeConsumed: `${s.timeConsumedMillis}  ms`,
+          memoryConsumed: `${s.memoryConsumedBytes / 1024}  KB`,
+          dateTime: dateTimeFromEpoch(s.creationTimeSeconds)
+        };
+      }));
+    });
+  }
 
   useEffect(() => {
-    ipcRenderer.send('get-user-submissions');
+    requstSubmissions();
   }, []);
 
   useInterval(() => {
-    ipcRenderer.send('get-user-submissions');
+    requstSubmissions();
   }, pendingCount ? 1000 : null);
 
   return (
