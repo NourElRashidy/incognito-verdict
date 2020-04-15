@@ -84,7 +84,8 @@ const getSubmitUrl = async (url) => {
 }
 
 const LANGUAGE_DROPDOWN_SELECTOR = '#pageContent > form > table > tbody > tr:nth-child(3) > td:nth-child(2) > select';
-const SOURCE_CODE_SELECTOR = '#editor > div.ace_scroller > div > div.ace_layer.ace_text-layer > div';
+const SOURCE_CODE_SELECTOR = '#sourceCodeTextarea';
+const EDITOR_TOGGLE_SELECTOR = '#toggleEditorCheckbox';
 const SUBMIT_BUTTON_SELECTOR = '#pageContent > form > table > tbody > tr:nth-child(6) > td > div > div > input';
 const SUBMIT_ERROR_SELECTOR = '#pageContent > form > table > tbody > tr:nth-child(5) > td:nth-child(2) > div > span';
 
@@ -99,6 +100,7 @@ const submitProblem = async (url, languageId, sourceCode) => {
             return e;
         }
         await page.select(LANGUAGE_DROPDOWN_SELECTOR, languageId);
+        await page.$eval(EDITOR_TOGGLE_SELECTOR, check => { check.click() });
         await page.click(SOURCE_CODE_SELECTOR);
         await page.keyboard.type(sourceCode);
         await page.click(SUBMIT_BUTTON_SELECTOR);
