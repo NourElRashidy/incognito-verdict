@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 let browser = null;
 
 async function startBrowser() {
-    browser = await puppeteer.launch();
+    browser = await puppeteer.launch({ headless: false });
 }
 
 module.exports = {
@@ -13,7 +13,16 @@ module.exports = {
         let page = await browser.newPage();
         if (cookies)
             await page.setCookie(...cookies);
-        page.setViewport({ width: 1366, height: 768 });
+        page.setViewport({ width: 1366, height: 1468 });
+        await page.setRequestInterception(true);
+        page.on('request', (req) => {
+            if (req.resourceType() == 'image' || req.resourceType() == 'stylesheet' || req.resourceType() == 'font') {
+                req.abort();
+            }
+            else {
+                req.continue();
+            }
+        });
         return page;
     },
     closePage: async (page) => {
