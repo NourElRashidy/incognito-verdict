@@ -40,4 +40,4 @@ app.on('activate', function () {
   }
 });
 
-require('./main-listeners');
+require('./controllers/CodeforcesController');
