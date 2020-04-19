@@ -1,8 +1,9 @@
 const { ipcRenderer } = window.require('electron');
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useArenaStore } from '../stores/ArenaStore'
 
-import { FormControl, InputLabel, Select, MenuItem, TextField, Button, LinearProgress, Typography } from '@material-ui/core';
+import { FormControl, InputLabel, Select, MenuItem, TextField, Button, LinearProgress } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -50,7 +51,6 @@ const SubmitForm = () => {
     ipcRenderer.send('session-health-check');
     ipcRenderer.send('submit-problem', { currentProblemURL, selectedSubmitLanguage, userSourceCode });
     ipcRenderer.once('submit-response', (_, response) => {
-      // TODO: handle feedback for both error and success
       setIsSubmitInProgress(false);
       if (response.success) {
         setUserSourceCode('');
@@ -96,12 +96,6 @@ const SubmitForm = () => {
           onChange={e => setUserSourceCode(e.target.value)}
         />
         {
-          submitErrorMessage &&
-          <Typography component="h1" variant="subtitle2" color="error">
-            {`*${submitErrorMessage}`}
-          </Typography>
-        }
-        {
           isSubmitInProgress &&
           <LinearProgress variant="query" />
         }
@@ -116,6 +110,10 @@ const SubmitForm = () => {
         >
           Submit
             </Button>
+        {
+          submitErrorMessage &&
+          <Alert variant="outlined" severity="error">{submitErrorMessage}</Alert>
+        }
       </FormControl>
     </div >
   );

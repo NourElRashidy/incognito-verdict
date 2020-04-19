@@ -3,9 +3,9 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./containers/App";
 
-function render(signedIn) {
+function render(signedIn, isSessionExpired) {
   ReactDOM.render(
-    <App signedIn={signedIn} />,
+    <App signedIn={signedIn} isSessionExpired={isSessionExpired} />,
     document.getElementById("root")
   );
 }
@@ -16,8 +16,7 @@ ipcRenderer.on('sign-in-successful', () => {
 });
 
 ipcRenderer.on('session-expired', () => {
-  // TODO: add feedback for logout
-  render(false);
+  render(false, true);
 });
 
 // initialize

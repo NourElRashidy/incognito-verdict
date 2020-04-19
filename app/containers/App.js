@@ -4,12 +4,12 @@ import { ArenaProvider } from '../stores/ArenaStore';
 import SignInPage from '../containers/SignInPage';
 import Arena from '../containers/Arena';
 
-function App({ signedIn }) {
+function App({ signedIn, isSessionExpired }) {
   return (
     <>
       {
         !signedIn &&
-        <SignInPage />
+        <SignInPage isSessionExpired={isSessionExpired} />
       }
       {
         signedIn &&

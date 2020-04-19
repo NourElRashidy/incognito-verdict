@@ -1,9 +1,7 @@
 import React from 'react';
 import SignInForm from '../components/SignInForm';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
-import Avatar from '@material-ui/core/Avatar';
-import CssBaseline from '@material-ui/core/CssBaseline';
+import { Grid, Paper, Avatar, CssBaseline } from '@material-ui/core';
+
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
@@ -16,8 +14,7 @@ const useStyles = makeStyles((theme) => ({
   image: {
     backgroundImage: 'url(./data/assets/bg.jpg)',
     backgroundRepeat: 'no-repeat',
-    backgroundColor:
-      theme.palette.type === 'light' ? theme.palette.grey[50] : theme.palette.grey[900],
+    backgroundColor: theme.palette.grey[50],
     backgroundSize: 'cover',
     backgroundPosition: 'center',
   },
@@ -25,14 +22,15 @@ const useStyles = makeStyles((theme) => ({
     alignSelf: 'center',
     justifySelf: 'center',
     width: theme.spacing(50),
-    height: theme.spacing(50)
+    height: theme.spacing(50),
+    marginLeft: -30
   },
   form: {
     paddingTop: '-50px'
   }
 }));
 
-const SignInPage = () => {
+const SignInPage = ({ isSessionExpired }) => {
   const classes = useStyles();
 
   return (
@@ -43,7 +41,7 @@ const SignInPage = () => {
         <div className={classes.icon}>
           <Avatar alt="Remy Sharp" src="./data/assets/icons/icon-transparent.png" className={classes.avatar} />
         </div>
-        <SignInForm />
+        <SignInForm isSessionExpired={isSessionExpired} />
       </Grid>
     </Grid>
   );

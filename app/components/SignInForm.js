@@ -2,40 +2,8 @@ const { ipcRenderer, shell } = window.require('electron');
 import React, { useState } from 'react';
 
 import { Box, Button, Link, TextField, Typography, LinearProgress } from '@material-ui/core';
+import { Alert, AlertTitle } from '@material-ui/lab';
 import { makeStyles } from '@material-ui/core/styles';
-
-function Disclaimer() {
-  const REPO_LINK = 'https://github.com/NourElRashidy/incognito-verdict';
-  return (
-    <>
-      <Typography variant="subtitle1" color="textPrimary" align="center">
-        {'Disclaimer'}
-      </Typography>
-      <Typography variant="body2" color="textSecondary" align="center">
-        {`Your username and password are only used to login to codeforces.
-        They are not sent to any remote servers other than codeforces.
-        They are not stored anywhere not even on your local machine.`}
-      </Typography>
-      <Typography variant="body2" color="textSecondary" align="center">
-        {'The source code is available, feel free to take a look.'}
-      </Typography>
-      <Typography variant="body2" align="center">
-        <Link
-          color="primary"
-          underline="always"
-          href={REPO_LINK}
-          onClick={(event) => {
-            event.preventDefault();
-            shell.openExternal(event.target.href);
-          }}
-        >
-          Source Code
-      </Link>
-      </Typography>
-
-    </>
-  );
-}
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -57,11 +25,36 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const SignInForm = () => {
+const Disclaimer = () => {
+  const REPO_LINK = 'https://github.com/NourElRashidy/incognito-verdict';
+  return (
+    <Alert variant="outlined" severity="info">
+      <AlertTitle>Disclaimer</AlertTitle>
+      Your username and password are only used to login to codeforces.
+      They are not sent to any remote servers other than codeforces.
+      They are not stored anywhere not even on your local machine. <br /> <br />
+      The&nbsp;
+        <Link
+        color="primary"
+        underline="always"
+        href={REPO_LINK}
+        onClick={(e) => {
+          e.preventDefault();
+          shell.openExternal(e.target.href);
+        }}
+      >
+        source code
+      </Link>
+      &nbsp;is available, feel free to take a look.
+    </Alert>
+  );
+}
+
+const SignInForm = ({ isSessionExpired }) => {
   const [handleOrEmail, setHandleOrEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fieldError, setFieldError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(isSessionExpired ? 'Session expired, please sign in again.' : null);
   const [isLoading, setIsLoading] = useState(false);
 
   const classes = useStyles();
@@ -123,12 +116,6 @@ const SignInForm = () => {
           onKeyPress={onEnterPress}
         />
         {
-          errorMessage &&
-          <Typography component="h1" variant="subtitle2" color="error">
-            {`*${errorMessage}`}
-          </Typography>
-        }
-        {
           isLoading &&
           <LinearProgress variant="query" />
         }
@@ -142,9 +129,13 @@ const SignInForm = () => {
           onClick={handleSubmit}
         >
           Sign In
-            </Button>
+        </Button>
+        {
+          errorMessage &&
+          <Alert variant="outlined" severity="error">{errorMessage}</Alert>
+        }
 
-        <Box mt={5}>
+        <Box mt={5} className={classes.disclaimer} >
           <Disclaimer />
         </Box>
       </div>

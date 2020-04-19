@@ -11,17 +11,17 @@ const REMEMBER_SELECTOR = '#remember';
 const LOGIN_FORM_SELECTOR = '#enterForm';
 const LOGIN_ERROR_SELECTOR = '#enterForm > table > tbody > tr.subscription-row > td:nth-child(2) > div > span';
 
-const isLoggedIn = async () => {
-    let loggedIn = false;
+const isSignedIn = async () => {
+    let signedIn = false;
     try {
         const page = await scraper.getNewPage(cookies);
         await page.goto(CODEFORCES_LOGIN_PAGE_URL);
         if (!page.url().includes(CODEFORCES_LOGIN_PAGE_URL))
-            loggedIn = true;
+            signedIn = true;
     }
     finally {
         scraper.closePage(page);
-        return loggedIn;
+        return signedIn;
     }
 }
 
@@ -29,12 +29,9 @@ const openSessionForUser = async (user, pass) => {
     return new Promise(async (resolve, reject) => {
         const page = await scraper.getNewPage();
         await page.goto(CODEFORCES_LOGIN_PAGE_URL);
-        console.log(page.url());
 
         page.on('requestfinished', async (request) => {
             if (page.url() === 'https://codeforces.com/') {
-                console.log(request.url());
-                console.log(page.url());
                 username = user;
                 cookies = await page.cookies();
                 scraper.closePage(page);
@@ -132,7 +129,6 @@ const submitProblem = async (url, languageId, sourceCode) => {
                 url,
                 [302, 200],
                 [() => {
-                    console.log('Submitted successfuly...');
                     scraper.closePage(page);
                     resolve();
                 }, async (response) => {
@@ -272,7 +268,7 @@ const getProblemStatement = async (url) => {
 }
 
 module.exports = {
-    isLoggedIn,
+    isSignedIn,
     openSessionForUser,
     closeRunningSession,
     submitProblem,

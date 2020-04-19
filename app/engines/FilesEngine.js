@@ -8,7 +8,6 @@ const writeToFile = (content, filePath) => {
         if (err) {
             throw err;
         }
-        console.log('The file was saved!');
     });
 };
 

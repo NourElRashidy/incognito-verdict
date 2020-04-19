@@ -7,7 +7,8 @@ import SubmitForm from '../components/SubmitForm';
 import ProblemStatement from '../components/ProblemStatement';
 import SubmissionsList from '../components/SubmissionsList';
 
-import { Toolbar, Tabs, Tab, Drawer, Chip, TextField, Button } from '@material-ui/core';
+import { Toolbar, Tabs, Tab, Drawer, Chip, TextField, Button, Snackbar } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 import { makeStyles } from '@material-ui/core/styles';
 
 let drawerWidth = 575;
@@ -83,6 +84,8 @@ const Arena = () => {
   const [isWaitingForURLInput, setIsWaitingForURLInput] = useState(true);
   const [inputURL, setInputURL] = useState(currentProblemURL);
   const [inputFieldError, setInputFieldError] = useState(false);
+  const [iserrorAlertActive, setIsErrorAlertActive] = useState(false);
+  const [errorAlertMessage, setErrorAlertMessage] = useState('');
 
 
   const classes = useStyles();
@@ -125,6 +128,13 @@ const Arena = () => {
     });
   }
 
+  const handleAlertClose = (_, reason) => {
+    if (reason !== 'clickaway') {
+      setIsErrorAlertActive(false);
+      setErrorAlertMessage('');
+    }
+  };
+
   useEffect(() => {
     if (currentProblemURL !== '') {
       startProblem();
@@ -143,8 +153,8 @@ const Arena = () => {
     ipcRenderer.send('get-problem-statement', currentProblemURL);
     ipcRenderer.once('problem-statement', (_, statement) => {
       if (!statement) {
-        // TODO: remove alert
-        alert('Failed to retrieve statement!');
+        setErrorAlertMessage('Failed to retrieve statement!');
+        setIsErrorAlertActive(true);
         return;
       }
       setCurrentProblemStatementHTML(statement);
@@ -158,8 +168,8 @@ const Arena = () => {
     ipcRenderer.send('get-available-languages');
     ipcRenderer.once('available-languages', (_, langs) => {
       if (!langs) {
-        // TODO: remove alert
-        alert('Failed to retrieve languages!');
+        setErrorAlertMessage('Failed to retrieve available submit languages!');
+        setIsErrorAlertActive(true);
         return;
       }
       setAvailableSubmitLanguagesList(langs);
@@ -236,6 +246,14 @@ const Arena = () => {
           <SubmitForm />
         </TabPanel>
       </div>
+
+      <Snackbar
+        open={iserrorAlertActive}
+        autoHideDuration={6000}
+        onClose={handleAlertClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+        <Alert onClose={handleAlertClose} severity="error">{errorAlertMessage}</Alert>
+      </Snackbar>
 
       <Drawer
         variant="permanent"

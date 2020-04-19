@@ -17,11 +17,11 @@ ipcMain.on('sign-in', async (event, userData) => {
 
 ipcMain.on('session-health-check', async (event) => {
     try {
-        if ((await codeforces.isLoggedIn()) !== true)
+        if ((await codeforces.isSignedIn()) !== true)
             event.sender.send('session-expired');
     }
     catch (e) {
-        console.log(e);
+        event.sender.send('session-expired');
     }
 });
 
@@ -53,7 +53,6 @@ ipcMain.on('submit-problem', async (event, { currentProblemURL, selectedSubmitLa
         event.sender.send('submit-response', { success: true });
     }
     catch (e) {
-        console.log(e);
         let message = e.message;
         if (!(e instanceof CodeforcesError))
             message = 'Failed to submit! Make sure that Codeforces is up and try again.'
@@ -71,7 +70,6 @@ ipcMain.on('get-user-submissions', async (event) => {
 });
 
 ipcMain.on('get-problem-statement', async (event, problemURL) => {
-    console.log(problemURL);
     try {
         event.sender.send('problem-statement', await codeforces.getProblemStatement(problemURL));
     }
