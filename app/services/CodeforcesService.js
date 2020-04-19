@@ -1,5 +1,5 @@
 const scraper = require('../engines/ScrapingEngine');
-
+const CodeforcesError = require('../errors/CodeforcesError');
 
 let username = null;
 let cookies = null;
@@ -8,40 +8,57 @@ const CODEFORCES_LOGIN_PAGE_URL = 'https://codeforces.com/enter';
 const USERNAME_SELECTOR = '#handleOrEmail';
 const PASSWORD_SELECTOR = '#password';
 const REMEMBER_SELECTOR = '#remember';
-const LOGIN_BUTTON_SELECTOR = '#enterForm > table > tbody > tr:nth-child(4) > td > div:nth-child(1) > input';
+const LOGIN_FORM_SELECTOR = '#enterForm';
 const LOGIN_ERROR_SELECTOR = '#enterForm > table > tbody > tr.subscription-row > td:nth-child(2) > div > span';
 
 const isLoggedIn = async () => {
-    const page = await scraper.getNewPage(cookies);
+    let loggedIn = false;
     try {
-        const element = await page.$(LOGIN_ERROR_SELECTOR);
-        const err_text = await page.evaluate(element => element.textContent, element);
-        scraper.closePage(page);
-        return err_text;
-    }
-    catch (e) {
+        const page = await scraper.getNewPage(cookies);
         await page.goto(CODEFORCES_LOGIN_PAGE_URL);
-        let loggedIn = false;
         if (!page.url().includes(CODEFORCES_LOGIN_PAGE_URL))
             loggedIn = true;
         scraper.closePage(page);
+    }
+    finally {
         return loggedIn;
     }
 }
 
 const openSessionForUser = async (user, pass) => {
-    username = user;
-    const page = await scraper.getNewPage();
-    await page.goto(CODEFORCES_LOGIN_PAGE_URL);
-    await page.click(USERNAME_SELECTOR);
-    await page.keyboard.type(user);
-    await page.click(PASSWORD_SELECTOR);
-    await page.keyboard.type(pass);
-    await page.click(REMEMBER_SELECTOR);
-    await page.click(LOGIN_BUTTON_SELECTOR);
-    await page.waitForNavigation();
-    cookies = await page.cookies();
-    return isLoggedIn();
+    return new Promise(async (resolve, reject) => {
+        const page = await scraper.getNewPage();
+        await page.goto(CODEFORCES_LOGIN_PAGE_URL);
+
+        page.on('requestfinished', async (response) => {
+            if (!response.url().includes(CODEFORCES_LOGIN_PAGE_URL))
+                return;
+            if (page.url().includes(CODEFORCES_LOGIN_PAGE_URL)) {
+                try {
+                    await page.waitForSelector(LOGIN_ERROR_SELECTOR);
+                    const err_text = await page.$eval(LOGIN_ERROR_SELECTOR, el => el.textContent);
+                    scraper.closePage(page);
+                    reject(new CodeforcesError(err_text));
+                }
+                catch (e) {
+                    scraper.closePage(page);
+                    reject(e);
+                }
+
+            }
+            else {
+                username = user;
+                cookies = await page.cookies();
+                scraper.closePage();
+                resolve();
+            }
+        });
+
+        await page.$eval(USERNAME_SELECTOR, (el, user) => el.value = user, user);
+        await page.$eval(PASSWORD_SELECTOR, (el, pass) => el.value = pass, pass);
+        await page.$eval(REMEMBER_SELECTOR, check => check.click());
+        await page.$eval(LOGIN_FORM_SELECTOR, form => form.submit());
+    });
 }
 
 const closeRunningSession = async () => {
@@ -75,7 +92,7 @@ const parseUrl = async (url) => {
             letter: urlInfo[2]
         };
 
-    throw ('invalid problem url!');
+    throw new Error('invalid problem url!');
 }
 
 const getSubmitUrl = async (url) => {
@@ -86,58 +103,67 @@ const getSubmitUrl = async (url) => {
 const LANGUAGE_DROPDOWN_SELECTOR = '#pageContent > form > table > tbody > tr:nth-child(3) > td:nth-child(2) > select';
 const SOURCE_CODE_SELECTOR = '#sourceCodeTextarea';
 const EDITOR_TOGGLE_SELECTOR = '#toggleEditorCheckbox';
-const SUBMIT_BUTTON_SELECTOR = '#pageContent > form > table > tbody > tr:nth-child(6) > td > div > div > input';
+const SUBMIT_FORM_SELECTOR = '#pageContent > form';
 const SUBMIT_ERROR_SELECTOR = '#pageContent > form > table > tbody > tr:nth-child(5) > td:nth-child(2) > div > span';
 
 const submitProblem = async (url, languageId, sourceCode) => {
-    const page = await scraper.getNewPage(cookies);
-    try {
+    return new Promise(async (resolve, reject) => {
+        const page = await scraper.getNewPage(cookies, true);
+        url = await getSubmitUrl(url);
         try {
-            await page.goto(await getSubmitUrl(url));
+            try {
+                await page.goto(url);
+            }
+            catch (e) {
+                scraper.closePage(page);
+                reject(e);
+            }
+
+            await scraper.listenForStatus(
+                page,
+                url,
+                [302, 200],
+                [() => {
+                    console.log('Submitted successfuly...');
+                    scraper.closePage(page);
+                    resolve();
+                }, async (response) => {
+                    // Check if submission is rejected due to repeated source code
+                    try {
+                        await page.setContent(await response.text());
+                        const err_text = await page.$eval(SUBMIT_ERROR_SELECTOR, el => el.textContent);
+                        scraper.closePage(page);
+                        reject(new CodeforcesError(err_text));
+                    }
+                    catch (e) {
+                        scraper.closePage(page);
+                        reject(e);
+                    }
+                }]
+            );
+
+            await page.waitForSelector(SUBMIT_FORM_SELECTOR);
+            await page.$eval(EDITOR_TOGGLE_SELECTOR, check => check.click());
+            await page.select(LANGUAGE_DROPDOWN_SELECTOR, languageId);
+            await page.$eval(SOURCE_CODE_SELECTOR, (el, sourceCode) => el.value = sourceCode, sourceCode);
+            await page.$eval(SUBMIT_FORM_SELECTOR, form => form.submit());
         }
         catch (e) {
             scraper.closePage(page);
-            return e;
+            reject(e);
         }
-        await page.select(LANGUAGE_DROPDOWN_SELECTOR, languageId);
-        await page.$eval(EDITOR_TOGGLE_SELECTOR, check => { check.click() });
-        await page.click(SOURCE_CODE_SELECTOR);
-        await page.keyboard.type(sourceCode);
-        await page.click(SUBMIT_BUTTON_SELECTOR);
-    }
-    catch (e) {
-        scraper.closePage(page);
-        throw new Error('Failed to submit!\n' + e);
-    }
-
-    if (page.url().includes('/my')) {
-        console.log('Submitted successfuly...');
-        scraper.closePage(page);
-        return true;
-    }
-
-    // Check if submission is rejected due to repeated submissions
-    try {
-        let element = await page.$(SUBMIT_ERROR_SELECTOR);
-        const err_text = await page.evaluate(element => element.textContent, element);
-        scraper.closePage(page);
-        return err_text;
-    }
-    catch (e) {
-        scraper.closePage(page);
-        return false;
-    }
+    });
 }
 
 const getAvailableLanguages = async (url) => {
     try {
+        return await require('../engines/FilesEngine').loadLanguages();
+    }
+    catch (e) {
+        if (!url)
+            url = 'https://codeforces.com/contest/1332/problem/F'
+        const page = await scraper.getNewPage(cookies);
         try {
-            return await require('../engines/FilesEngine').loadLanguages();
-        }
-        catch (e) {
-            if (!url)
-                url = 'https://codeforces.com/contest/1332/problem/F'
-            const page = await scraper.getNewPage(cookies);
             await page.goto(url);
             const languages = await page.evaluate(optionSelector => {
                 return Array.from(document.querySelectorAll(optionSelector))
@@ -153,16 +179,16 @@ const getAvailableLanguages = async (url) => {
             scraper.closePage(page);
             return languages;
         }
-    }
-    catch (e) {
-        scraper.closePage(page);
-        throw new Error('Failed to retrieve languages!\n' + e);
+        catch (e) {
+            scraper.closePage(page);
+            throw e;
+        }
     }
 }
 
 const getUserSubmissions = async () => {
     return new Promise(async (resolve, reject) => {
-        const url = `https://codeforces.com/api/user.status?handle=${username}&from=1&count=50`;
+        const url = `https://codeforces.com/api/user.status?handle=${username}&from=1&count=30`;
         const page = await scraper.getNewPage();
         page.on('response', async response => {
             if (response.url() === url) {
@@ -197,7 +223,7 @@ const getProblemName = async (url) => {
                 try {
                     const problem = (await response.json()).result.problems.filter(p => p.index === urlInfo.letter);
                     scraper.closePage(page);
-                    resolve(`${problem[0].contestId} | ${problem[0].index} - ${problem[0].name}`);
+                    resolve(`[${problem[0].contestId}] ${problem[0].index} - ${problem[0].name}`);
                 }
                 catch (e) {
                     scraper.closePage(page);
@@ -215,11 +241,35 @@ const getProblemName = async (url) => {
     });
 }
 
+const PROBLEM_STATEMENT_SELECTOR = '#pageContent > div.problemindexholder';
+const COPY_BUTTONS_SELECTOR = '.input-output-copier';
+const getProblemStatement = async (url) => {
+    try {
+        const page = await scraper.getNewPage();
+        await page.goto(url);
+        const statement = await page.$eval(PROBLEM_STATEMENT_SELECTOR, (el, sel) => {
+            var copyButtons = el.querySelectorAll(sel);
+            for (var i = 0; i < copyButtons.length; i++) {
+                copyButtons[i].parentNode.removeChild(copyButtons[i]);
+            }
+            return el.innerHTML
+        }, COPY_BUTTONS_SELECTOR);
+        scraper.closePage(page);
+        return statement;
+    }
+    catch (e) {
+        scraper.closePage(page);
+        throw e;
+    }
+}
+
 module.exports = {
+    isLoggedIn,
     openSessionForUser,
     closeRunningSession,
     submitProblem,
     getAvailableLanguages,
     getUserSubmissions,
-    getProblemName
+    getProblemName,
+    getProblemStatement
 };
