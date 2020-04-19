@@ -1,12 +1,9 @@
 const { ipcRenderer } = window.require('electron');
 const { dateTimeFromEpoch } = require('../services/Utils');
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useArenaStore } from '../stores/ArenaStore'
 
-import {
-  Card, CardMedia, CardActionArea, CardContent,
-  Typography, Divider,
-  Grid, Box
-} from '@material-ui/core';
+import { Card, CardMedia, CardActionArea, CardContent, Typography, Divider, Grid, Box } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 
 import cx from 'clsx';
@@ -145,8 +142,10 @@ const verdictMapping = (verdict) => {
 }
 
 const SubmissionsList = () => {
-  const [submissions, setSubmissions] = useState([]);
-  const [pendingCount, setPendingCount] = useState(0);
+  const {
+    pendingSubmissionsCount, setPendingSubmissionsCount,
+    userSubmissionsList, setUserSubmissionsList
+  } = useArenaStore();
 
   const classes = useStyles();
 
@@ -154,12 +153,11 @@ const SubmissionsList = () => {
     ipcRenderer.send('get-user-submissions');
     ipcRenderer.once('user-submissions', (_, subs) => {
       if (!subs) {
-        if ((!submissions || !submissions.length()) && !pendingCount) // avoid making redundant requests
+        if ((!userSubmissionsList || !userSubmissionsList.length()) && !pendingSubmissionsCount) // avoid making redundant requests
           requstSubmissions();
         return;
       }
-      setPendingCount(subs.filter(s => !s.verdict).length);
-      setSubmissions(subs.map(s => {
+      subs = subs.map(s => {
         return {
           id: s.id,
           problemName: `${s.problem.index} - ${s.problem.name}`,
@@ -168,7 +166,9 @@ const SubmissionsList = () => {
           memoryConsumed: `${s.memoryConsumedBytes / 1024}  KB`,
           dateTime: dateTimeFromEpoch(s.creationTimeSeconds)
         };
-      }));
+      });
+      setPendingSubmissionsCount(subs.filter(s => s.verdict.text === 'Pending').length);
+      setUserSubmissionsList(subs);
     });
   }
 
@@ -178,13 +178,13 @@ const SubmissionsList = () => {
 
   useInterval(() => {
     requstSubmissions();
-  }, pendingCount ? 1000 : null);
+  }, pendingSubmissionsCount ? 1000 : null);
 
   return (
     <div className={classes.root}>
       <Grid container spacing={2}>
         {
-          (!submissions || !submissions.length) &&
+          (!userSubmissionsList || !userSubmissionsList.length) &&
           [...Array(50)].map((_, i) => {
             return (
               <SkeletonCard key={i} />
@@ -192,7 +192,7 @@ const SubmissionsList = () => {
           })
         }
         {
-          submissions.map(s => {
+          userSubmissionsList.map(s => {
             return (
               <Grid item xs>
                 <Card key={s.id} className={classes.problemCard}>

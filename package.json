@@ -52,6 +52,7 @@
     "@material-ui/lab": "^4.0.0-alpha.49",
     "clsx": "^1.1.0",
     "moment": "^2.24.0",
+    "prop-types": "^15.7.2",
     "puppeteer": "^2.1.1"
   }
 }

@@ -1,8 +1,8 @@
 import React from "react";
 import { hot } from "react-hot-loader";
+import { ArenaProvider } from '../stores/ArenaStore';
 import SignInPage from '../containers/SignInPage';
-import SubmissionsList from '../components/SubmissionsList';
-import '../assets/baseline.css';
+import Arena from '../containers/Arena';
 
 function App({ signedIn }) {
   return (
@@ -13,7 +13,9 @@ function App({ signedIn }) {
       }
       {
         signedIn &&
-        <SubmissionsList />
+        <ArenaProvider>
+          <Arena />
+        </ArenaProvider>
       }
     </>
   );
