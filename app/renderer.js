@@ -15,6 +15,10 @@ ipcRenderer.on('sign-in-successful', () => {
   render(true);
 });
 
+ipcRenderer.on('session-expired', () => {
+  // TODO: add feedback for logout
+  render(false);
+});
 
 // initialize
 render(false);
