@@ -5,7 +5,6 @@ import { useArenaStore } from '../stores/ArenaStore'
 import { FormControl, InputLabel, Select, MenuItem, TextField, Button, LinearProgress, Typography } from '@material-ui/core';
 
 import { makeStyles } from '@material-ui/core/styles';
-import '../assets/baseline.css'
 
 const useStyles = makeStyles((theme) => ({
   paper: {

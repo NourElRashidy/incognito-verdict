@@ -64,6 +64,7 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
   },
   submit: {
+    height: 45,
     margin: '20px 15px 15px',
   }
 }));
@@ -109,13 +110,19 @@ const Arena = () => {
       return;
     }
 
-    // TODO: validate URL
-
-    setIsWaitingForURLInput(false);
-    setInputFieldError(false);
-    setCurrentProblemName('');
-    setCurrentProblemStatementHTML(null);
-    setCurrentProblemURL(inputURL);
+    ipcRenderer.send('validate-problem-url', inputURL);
+    ipcRenderer.once('validate-problem-url-feedback', (_, isValidURL) => {
+      if (isValidURL) {
+        setIsWaitingForURLInput(false);
+        setInputFieldError(false);
+        setCurrentProblemName('');
+        setCurrentProblemStatementHTML(null);
+        setCurrentProblemURL(inputURL);
+      }
+      else {
+        setInputFieldError(true);
+      }
+    });
   }
 
   useEffect(() => {
@@ -181,7 +188,8 @@ const Arena = () => {
                 margin="normal"
                 fullWidth
                 required
-                error={inputFieldError && inputURL === ''}
+                error={inputFieldError}
+                helperText={inputFieldError && "Invalid codeforces problem url."}
                 id="problem-url"
                 label="Problem URL"
                 name="problemURL"

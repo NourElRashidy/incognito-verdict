@@ -53,7 +53,9 @@ const openSessionForUser = async (user, pass) => {
             scraper.closePage(page);
             reject(new CodeforcesError(err_text));
         }
-        catch (e) { }
+        catch (e) {
+            reject(e);
+        }
     });
 }
 
@@ -63,7 +65,7 @@ const closeRunningSession = async () => {
     cookies = null;
 }
 
-const parseUrl = async (url) => {
+const parseUrl = (url) => {
     let urlInfo = url.match('https://codeforces.com/problemset/problem/(.*)/(.*)');
     if (urlInfo)
         return {
@@ -91,8 +93,18 @@ const parseUrl = async (url) => {
     throw new Error('invalid problem url!');
 }
 
+const isValidProblemUrl = (url) => {
+    try {
+        parseUrl(url)
+        return true;
+    }
+    catch (e) {
+        return false;
+    }
+}
+
 const getSubmitUrl = async (url) => {
-    let urlInfo = await parseUrl(url);
+    let urlInfo = parseUrl(url);
     return `https://codeforces.com/${urlInfo.type}/${urlInfo.id}/submit/${urlInfo.letter}`;
 }
 
@@ -267,5 +279,6 @@ module.exports = {
     getAvailableLanguages,
     getUserSubmissions,
     getProblemName,
-    getProblemStatement
+    getProblemStatement,
+    isValidProblemUrl
 };

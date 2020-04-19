@@ -25,6 +25,10 @@ ipcMain.on('session-health-check', async (event) => {
     }
 });
 
+ipcMain.on('validate-problem-url', async (event, url) => {
+    event.sender.send('validate-problem-url-feedback', codeforces.isValidProblemUrl(url));
+});
+
 ipcMain.on('get-problem-name', async (event, url) => {
     try {
         event.sender.send('problem-name', await codeforces.getProblemName(url));
