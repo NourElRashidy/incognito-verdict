@@ -31,7 +31,7 @@ module.exports = {
     loadLanguages: async () => {
         return JSON.parse(await readfromFile(CACHED_LANGUAGES_PATH));
     },
-    saveLanguaged: async (langs) => {
+    saveLanguages: async (langs) => {
         writeToFile(JSON.stringify(langs), CACHED_LANGUAGES_PATH);
     }
 };
