@@ -18,9 +18,9 @@ const isLoggedIn = async () => {
         await page.goto(CODEFORCES_LOGIN_PAGE_URL);
         if (!page.url().includes(CODEFORCES_LOGIN_PAGE_URL))
             loggedIn = true;
-        scraper.closePage(page);
     }
     finally {
+        scraper.closePage(page);
         return loggedIn;
     }
 }
@@ -29,27 +29,15 @@ const openSessionForUser = async (user, pass) => {
     return new Promise(async (resolve, reject) => {
         const page = await scraper.getNewPage();
         await page.goto(CODEFORCES_LOGIN_PAGE_URL);
+        console.log(page.url());
 
-        page.on('requestfinished', async (response) => {
-            if (!response.url().includes(CODEFORCES_LOGIN_PAGE_URL))
-                return;
-            if (page.url().includes(CODEFORCES_LOGIN_PAGE_URL)) {
-                try {
-                    await page.waitForSelector(LOGIN_ERROR_SELECTOR);
-                    const err_text = await page.$eval(LOGIN_ERROR_SELECTOR, el => el.textContent);
-                    scraper.closePage(page);
-                    reject(new CodeforcesError(err_text));
-                }
-                catch (e) {
-                    scraper.closePage(page);
-                    reject(e);
-                }
-
-            }
-            else {
+        page.on('requestfinished', async (request) => {
+            if (page.url() === 'https://codeforces.com/') {
+                console.log(request.url());
+                console.log(page.url());
                 username = user;
                 cookies = await page.cookies();
-                scraper.closePage();
+                scraper.closePage(page);
                 resolve();
             }
         });
@@ -58,6 +46,14 @@ const openSessionForUser = async (user, pass) => {
         await page.$eval(PASSWORD_SELECTOR, (el, pass) => el.value = pass, pass);
         await page.$eval(REMEMBER_SELECTOR, check => check.click());
         await page.$eval(LOGIN_FORM_SELECTOR, form => form.submit());
+
+        try {
+            await page.waitForSelector(LOGIN_ERROR_SELECTOR);
+            const err_text = await page.$eval(LOGIN_ERROR_SELECTOR, el => el.textContent);
+            scraper.closePage(page);
+            reject(new CodeforcesError(err_text));
+        }
+        catch (e) { }
     });
 }
 
