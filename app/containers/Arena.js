@@ -238,18 +238,23 @@ const Arena = () => {
           }
         </Toolbar>
 
-        <TabPanel currentTab={currentTab} tabIndex={0} className={classes.mainTab}>
-          <ProblemStatement />
-        </TabPanel>
+        {
+          !isWaitingForURLInput &&
+          <>
+            <TabPanel currentTab={currentTab} tabIndex={0} className={classes.mainTab}>
+              <ProblemStatement />
+            </TabPanel>
 
-        <TabPanel currentTab={currentTab} tabIndex={1} className={classes.mainTab}>
-          <SubmitForm />
-        </TabPanel>
+            <TabPanel currentTab={currentTab} tabIndex={1} className={classes.mainTab}>
+              <SubmitForm />
+            </TabPanel>
+          </>
+        }
       </div>
 
       <Snackbar
         open={iserrorAlertActive}
-        autoHideDuration={6000}
+        autoHideDuration={10000}
         onClose={handleAlertClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
         <Alert onClose={handleAlertClose} severity="error">{errorAlertMessage}</Alert>

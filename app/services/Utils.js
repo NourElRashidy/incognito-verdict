@@ -10,5 +10,8 @@ module.exports = {
     },
     dateTimeFromEpoch: (epoch) => {
         return moment.unix(epoch).format('dddd, MMM/DD/YYYY HH:mm Z');
+    },
+    randomIntInRange: (l, r) => {
+        return l + Math.floor(Math.random() * Math.floor(r - l + 1));
     }
 }
