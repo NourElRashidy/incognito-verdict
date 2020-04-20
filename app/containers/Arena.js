@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useArenaStore } from '../stores/ArenaStore'
 
+import SplashScreen from '../components/SplashScreen';
 import SubmitForm from '../components/SubmitForm';
 import ProblemStatement from '../components/ProblemStatement';
 import SubmissionsList from '../components/SubmissionsList';
@@ -71,8 +72,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Arena = () => {
-  const [currentTab, setCurrentTab] = useState(0);
-
   const {
     currentProblemURL, setCurrentProblemURL,
     currentproblemName, setCurrentProblemName,
@@ -80,7 +79,7 @@ const Arena = () => {
     setCurrentProblemStatementHTML
   } = useArenaStore();
 
-
+  const [currentTab, setCurrentTab] = useState(0);
   const [isWaitingForURLInput, setIsWaitingForURLInput] = useState(true);
   const [inputURL, setInputURL] = useState(currentProblemURL);
   const [inputFieldError, setInputFieldError] = useState(false);
@@ -90,15 +89,15 @@ const Arena = () => {
 
   const classes = useStyles();
 
-  const onKeyPress = (ev) => {
-    if (ev.keyCode === 27 && ev.target.name === 'problemURL' && currentProblemURL !== '') { // Escape key
+  const onKeyPress = (e) => {
+    if (e.keyCode === 27 && e.target.name === 'problemURL' && currentProblemURL !== '') { // Escape key
       setIsWaitingForURLInput(false);
-      ev.preventDefault();
+      e.preventDefault();
     }
 
-    if (ev.key === 'Enter' && ev.target.name === 'problemURL') {
+    if (e.key === 'Enter' && e.target.name === 'problemURL') {
       handleSubmit();
-      ev.preventDefault();
+      e.preventDefault();
     }
   }
 
@@ -237,7 +236,10 @@ const Arena = () => {
             </>
           }
         </Toolbar>
-
+        {
+          isWaitingForURLInput &&
+          <SplashScreen />
+        }
         {
           !isWaitingForURLInput &&
           <>
