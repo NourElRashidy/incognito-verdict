@@ -8,22 +8,6 @@ const useStyles = makeStyles((theme) => ({
   media: {
     height: 160,
   },
-  box: {
-    position: 'relative',
-    '&:not(:last-of-type)': {
-      '&:after': {
-        content: '" "',
-        display: 'block',
-        position: 'absolute',
-        height: '35%',
-        width: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.12)',
-        top: '50%',
-        right: 0,
-        transform: 'translateY(-50%)',
-      }
-    }
-  },
   skeletonCard: {
     borderRadius: theme.spacing(1),
     width: 270,

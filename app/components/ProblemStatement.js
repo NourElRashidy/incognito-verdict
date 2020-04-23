@@ -4,7 +4,7 @@ import { randomIntInRange } from '../services/Utils'
 
 import Skeleton from '@material-ui/lab/Skeleton';
 import { makeStyles } from '@material-ui/core/styles';
-import '../assets/codeforces.css'
+import '../assets/codeforces.css';
 
 const useStyles = makeStyles((theme) => ({
   paper: {

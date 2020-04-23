@@ -84,7 +84,7 @@ const SignInForm = ({ isSessionExpired }) => {
   return (
     <div className={classes.paper}>
       <Typography component="h1" variant="h5" color="textSecondary">
-        Sign in to codeforces
+        sign in to codeforces
       </Typography>
       <div className={classes.form}>
         <TextField

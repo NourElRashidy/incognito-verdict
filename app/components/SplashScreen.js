@@ -35,7 +35,7 @@ const SplashScreen = () => {
         <div className={classes.icon} />
         <Typography component="h1" variant="h5" color="textSecondary" style={{ textAlign: 'center', margin: '3%' }}>
           please start a problem to start using the arena
-      </Typography>
+        </Typography>
       </div>
     </div>
   );

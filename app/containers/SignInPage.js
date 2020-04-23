@@ -21,12 +21,12 @@ const useStyles = makeStyles((theme) => ({
   avatar: {
     alignSelf: 'center',
     justifySelf: 'center',
-    width: theme.spacing(50),
-    height: theme.spacing(50),
+    width: theme.spacing(60),
+    height: theme.spacing(60),
     marginLeft: -30
   },
   form: {
-    paddingTop: '-50px'
+    paddingTop: -50
   }
 }));
 
@@ -39,7 +39,7 @@ const SignInPage = ({ isSessionExpired }) => {
       <Grid item xs={false} sm={4} md={7} className={classes.image} />
       <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
         <div className={classes.icon}>
-          <Avatar alt="Remy Sharp" src="./data/assets/icons/icon-transparent.png" className={classes.avatar} />
+          <Avatar src="./data/assets/icons/icon-transparent.png" className={classes.avatar} />
         </div>
         <SignInForm isSessionExpired={isSessionExpired} />
       </Grid>
