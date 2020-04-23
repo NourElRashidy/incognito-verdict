@@ -1,3 +1,4 @@
+const { shell } = window.require('electron');
 import React from 'react';
 import { Card, CardMedia, CardActionArea, CardContent, Typography, Divider, Box } from '@material-ui/core';
 
@@ -77,6 +78,10 @@ const SubmissionCard = ({ submissionInfo, imageUrl }) => {
         <CardMedia
           className={classes.media}
           image={imageUrl}
+          onClick={(e) => {
+            e.preventDefault();
+            shell.openExternal(imageUrl);
+          }}
         />
       </CardActionArea>
       <CardContent>
