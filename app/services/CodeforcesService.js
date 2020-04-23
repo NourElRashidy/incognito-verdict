@@ -13,15 +13,15 @@ const LOGIN_ERROR_SELECTOR = '#enterForm > table > tbody > tr.subscription-row >
 
 const isSignedIn = async () => {
     let signedIn = false;
+    const page = await scraper.getNewPage(cookies);
     try {
-        const page = await scraper.getNewPage(cookies);
-        await page.goto(CODEFORCES_LOGIN_PAGE_URL);
-        if (!page.url().includes(CODEFORCES_LOGIN_PAGE_URL))
+        const response = await page.goto(CODEFORCES_LOGIN_PAGE_URL);
+        if (!response.url().includes(CODEFORCES_LOGIN_PAGE_URL))
             signedIn = true;
+        return signedIn;
     }
     finally {
         scraper.closePage(page);
-        return signedIn;
     }
 }
 
@@ -122,6 +122,7 @@ const submitProblem = async (url, languageId, sourceCode) => {
             catch (e) {
                 scraper.closePage(page);
                 reject(e);
+                return;
             }
 
             await scraper.listenForStatus(
