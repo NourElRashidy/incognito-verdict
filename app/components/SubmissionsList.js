@@ -1,6 +1,6 @@
 const { ipcRenderer } = window.require('electron');
 const { dateTimeFromEpoch } = require('../services/Utils');
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useArenaStore } from '../stores/ArenaStore'
 
 import SubmissionCard from './SubmissionCard';
@@ -36,7 +36,9 @@ const useInterval = (callback, delay) => {
 
 const verdictMapping = (verdict) => {
   switch (verdict) {
-    case null || 'TESTING':
+    case undefined:
+    case null:
+    case 'TESTING':
       return {
         text: 'Pending',
         cardStyle: 'greyCard',
@@ -75,12 +77,22 @@ const SubmissionsList = () => {
     userSubmissionsList, setUserSubmissionsList
   } = useArenaStore();
 
+  const [imagesList, setImagesList] = useState([]);
   const classes = useStyles();
+
+  const updateSubmissions = (subs) => {
+    ipcRenderer.send('get-images-window', subs.length);
+    ipcRenderer.once('images-window', (_, imgs) => {
+      setImagesList(imgs);
+      setUserSubmissionsList(subs);
+    });
+  }
 
   const requstSubmissions = () => {
     ipcRenderer.send('get-user-submissions');
     ipcRenderer.once('user-submissions', (_, subs) => {
       if (!subs) {
+        // retry on failure
         if ((!userSubmissionsList || !userSubmissionsList.length()) && !pendingSubmissionsCount) // avoid making redundant requests
           requstSubmissions();
         return;
@@ -96,7 +108,7 @@ const SubmissionsList = () => {
         };
       });
       setPendingSubmissionsCount(subs.filter(s => s.verdict.text === 'Pending').length);
-      setUserSubmissionsList(subs);
+      updateSubmissions(subs);
     });
   }
 
@@ -106,7 +118,7 @@ const SubmissionsList = () => {
 
   useInterval(() => {
     requstSubmissions();
-  }, pendingSubmissionsCount ? 1000 : null);
+  }, pendingSubmissionsCount ? 2000 : null);
 
   return (
     <div className={classes.root}>
@@ -122,10 +134,10 @@ const SubmissionsList = () => {
           })
         }
         {
-          userSubmissionsList.map(s => {
+          userSubmissionsList.map((sub, i) => {
             return (
               <Grid item xs>
-                <SubmissionCard submissionInfo={s} />
+                <SubmissionCard submissionInfo={sub} imageUrl={imagesList[i]} />
               </Grid>
             );
           })

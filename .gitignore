@@ -110,6 +110,9 @@ dist/
 tmp/
 temp/
 
+# Configs
+/app/configs
+
 ### react ###
 .DS_*
 **/*.backup.*

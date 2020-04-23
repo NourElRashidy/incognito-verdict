@@ -68,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const SubmissionCard = ({ submissionInfo }) => {
+const SubmissionCard = ({ submissionInfo, imageUrl }) => {
   const classes = useStyles();
 
   return (
@@ -76,7 +76,7 @@ const SubmissionCard = ({ submissionInfo }) => {
       <CardActionArea>
         <CardMedia
           className={classes.media}
-          image="./data/assets/bg.jpg"
+          image={imageUrl}
         />
       </CardActionArea>
       <CardContent>

@@ -52,6 +52,7 @@ const SubmitForm = () => {
     ipcRenderer.send('submit-problem', { currentProblemURL, selectedSubmitLanguage, userSourceCode });
     ipcRenderer.once('submit-response', (_, response) => {
       setIsSubmitInProgress(false);
+      ipcRenderer.send('shift-images-window');
       if (response.success) {
         setUserSourceCode('');
         incrementPendingSubmissionsCount();

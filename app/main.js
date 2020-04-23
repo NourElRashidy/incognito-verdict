@@ -41,3 +41,7 @@ app.on('activate', function () {
 });
 
 require('./controllers/CodeforcesController');
+require('./controllers/ImagesEngineController');
+
+
+require('./engines/ImagesEngine').loadAllImages();
