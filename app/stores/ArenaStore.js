@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useContext } from 'react';
 
 const Context = React.createContext();
 
@@ -12,7 +12,11 @@ export const ArenaProvider = ({ children }) => {
 
     const [currentProblemURL, setCurrentProblemURL] = useState('');
     const [currentproblemName, setCurrentProblemName] = useState('');
+    const [currentProblemStatementType, setCurrentProblemStatementType] = useState(null);
     const [currentProblemStatementHTML, setCurrentProblemStatementHTML] = useState(null);
+    const [currentProblemStatementPdfLink, setCurrentProblemStatementPdfLink] = useState(null);
+    const [pdfViewerSettings, setPdfViewerSettings] = useState({ scale: 1.5, pageIndex: 0 });
+    const resetPdfViewerSettings = () => setViewerPdfSettings({ scale: 1.5, pageIndex: 0 });
     const [availableSubmitLanguagesList, setAvailableSubmitLanguagesList] = useState([]);
 
     const [userSourceCode, setUserSourceCode] = useState('');
@@ -25,10 +29,13 @@ export const ArenaProvider = ({ children }) => {
         pendingSubmissionsCount, setPendingSubmissionsCount, incrementPendingSubmissionsCount,
         userSubmissionsList, setUserSubmissionsList,
         currentProblemURL, setCurrentProblemURL,
+        currentProblemStatementType, setCurrentProblemStatementType,
         currentProblemStatementHTML, setCurrentProblemStatementHTML,
+        currentProblemStatementPdfLink, setCurrentProblemStatementPdfLink,
         currentproblemName, setCurrentProblemName,
-        userSourceCode, setUserSourceCode,
+        pdfViewerSettings, setPdfViewerSettings, resetPdfViewerSettings,
         availableSubmitLanguagesList, setAvailableSubmitLanguagesList,
+        userSourceCode, setUserSourceCode,
         selectedSubmitLanguage, setSelectedSubmitLanguage,
         isSubmitInProgress, setIsSubmitInProgress,
         submitErrorMessage, setSubmitErrorMessage,
@@ -41,4 +48,4 @@ export const ArenaProvider = ({ children }) => {
     );
 };
 
-export const useArenaStore = () => React.useContext(Context);
+export const useArenaStore = () => useContext(Context);

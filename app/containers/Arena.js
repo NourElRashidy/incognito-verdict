@@ -32,7 +32,8 @@ const useStyles = makeStyles((theme) => ({
   },
   mainTab: {
     display: 'flex',
-    flexShrink: 0,
+    height: '94%',
+    flexShrink: 1,
     justifyContent: 'center',
   },
   toolbar: theme.mixins.toolbar,
@@ -76,7 +77,10 @@ const Arena = () => {
     currentProblemURL, setCurrentProblemURL,
     currentproblemName, setCurrentProblemName,
     availableSubmitLanguagesList, setAvailableSubmitLanguagesList,
-    setCurrentProblemStatementHTML
+    setCurrentProblemStatementType,
+    setCurrentProblemStatementHTML,
+    setCurrentProblemStatementPdfLink,
+    resetPdfViewerSettings,
   } = useArenaStore();
 
   const [currentTab, setCurrentTab] = useState(0);
@@ -85,7 +89,6 @@ const Arena = () => {
   const [inputFieldError, setInputFieldError] = useState(false);
   const [iserrorAlertActive, setIsErrorAlertActive] = useState(false);
   const [errorAlertMessage, setErrorAlertMessage] = useState('');
-
 
   const classes = useStyles();
 
@@ -118,8 +121,11 @@ const Arena = () => {
         setIsWaitingForURLInput(false);
         setInputFieldError(false);
         setCurrentProblemName('');
+        setCurrentProblemStatementType(null);
         setCurrentProblemStatementHTML(null);
+        setCurrentProblemStatementPdfLink(null);
         setCurrentProblemURL(inputURL);
+        resetPdfViewerSettings();
       }
       else {
         setInputFieldError(true);
@@ -150,13 +156,19 @@ const Arena = () => {
 
   const requestProblemStatement = () => {
     ipcRenderer.send('get-problem-statement', currentProblemURL);
-    ipcRenderer.once('problem-statement', (_, statement) => {
-      if (!statement) {
+    ipcRenderer.once('problem-statement', (_, statementInfo) => {
+      if (!statementInfo) {
         setErrorAlertMessage('Failed to retrieve statement!');
         setIsErrorAlertActive(true);
         return;
       }
-      setCurrentProblemStatementHTML(statement);
+      else {
+        if (statementInfo.type === 'HTML')
+          setCurrentProblemStatementHTML(statementInfo.statement);
+        else if (statementInfo.type === 'PDF')
+          setCurrentProblemStatementPdfLink(statementInfo.englishPdfLink);
+        setCurrentProblemStatementType(statementInfo.type);
+      }
     });
   }
 

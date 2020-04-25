@@ -248,19 +248,31 @@ const getProblemName = async (url) => {
 
 const PROBLEM_STATEMENT_SELECTOR = '#pageContent > div.problemindexholder';
 const COPY_BUTTONS_SELECTOR = '.input-output-copier';
+const ATTAHMENTS_TABLE_SELECTOR = '#pageContent > div.datatable > div:nth-child(6) > table';
 const getProblemStatement = async (url) => {
+    const page = await scraper.getNewPage();
+    const response = await page.goto(url);
+    await page.setContent(await response.text());
     try {
-        const page = await scraper.getNewPage();
-        await page.goto(url);
-        const statement = await page.$eval(PROBLEM_STATEMENT_SELECTOR, (el, sel) => {
-            var copyButtons = el.querySelectorAll(sel);
-            for (var i = 0; i < copyButtons.length; i++) {
-                copyButtons[i].parentNode.removeChild(copyButtons[i]);
-            }
-            return el.innerHTML
-        }, COPY_BUTTONS_SELECTOR);
-        scraper.closePage(page);
-        return statement;
+        if (response.url().includes('attachments')) {
+            const englishPdfLink = await page.$eval(ATTAHMENTS_TABLE_SELECTOR, (table) => {
+                for (var i = 0, row; row = table.rows[i]; i++)
+                    if (row.cells[1].innerText.includes('English'))
+                        return row.cells[2].querySelector('a').href;
+            });
+            return { type: 'PDF', englishPdfLink };
+        }
+        else {
+            const statement = await page.$eval(PROBLEM_STATEMENT_SELECTOR, (el, sel) => {
+                var copyButtons = el.querySelectorAll(sel);
+                for (var i = 0; i < copyButtons.length; i++) {
+                    copyButtons[i].parentNode.removeChild(copyButtons[i]);
+                }
+                return el.innerHTML;
+            }, COPY_BUTTONS_SELECTOR);
+            scraper.closePage(page);
+            return { type: 'HTML', statement };
+        }
     }
     catch (e) {
         scraper.closePage(page);
