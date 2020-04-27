@@ -8,9 +8,11 @@ import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles((theme) => ({
   paper: {
     margin: theme.spacing(-10, 4),
+    marginBottom: 10,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    height: 'fit-content'
   },
   avatar: {
     margin: theme.spacing(1),
@@ -134,11 +136,10 @@ const SignInForm = ({ isSessionExpired }) => {
           errorMessage &&
           <Alert variant="outlined" severity="error">{errorMessage}</Alert>
         }
-
-        <Box mt={5} className={classes.disclaimer} >
-          <Disclaimer />
-        </Box>
       </div>
+      <Box mt={5} className={classes.disclaimer} >
+        <Disclaimer />
+      </Box>
     </div>
   );
 }

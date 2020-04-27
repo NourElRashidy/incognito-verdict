@@ -1,38 +1,13 @@
 const { ipcRenderer } = window.require('electron');
 const { dateTimeFromEpoch } = require('../services/Utils');
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useArenaStore } from '../stores/ArenaStore'
+import useWindowDimensions from '../hooks/useWindowDimensions';
+import useInterval from '../hooks/useInterval';
 
 import SubmissionCard from './SubmissionCard';
 import SkeletonCard from './SkeletonCard';
 import { Grid } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  }
-}));
-
-const useInterval = (callback, delay) => {
-  const savedCallback = useRef();
-
-  // Remember the latest function.
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
-
-  // Set up the interval.
-  useEffect(() => {
-    function tick() {
-      savedCallback.current();
-    }
-    if (delay !== null) {
-      let id = setInterval(tick, delay);
-      return () => clearInterval(id);
-    }
-  }, [delay]);
-}
 
 const verdictMapping = (verdict) => {
   switch (verdict) {
@@ -78,7 +53,7 @@ const SubmissionsList = () => {
   } = useArenaStore();
 
   const [imagesList, setImagesList] = useState([]);
-  const classes = useStyles();
+  const { windowWidth } = useWindowDimensions();
 
   const updateSubmissions = (subs) => {
     ipcRenderer.send('get-images-window', subs.length);
@@ -121,29 +96,27 @@ const SubmissionsList = () => {
   }, pendingSubmissionsCount ? 2000 : null);
 
   return (
-    <div className={classes.root}>
-      <Grid container spacing={2}>
-        {
-          (!userSubmissionsList || !userSubmissionsList.length) &&
-          [...Array(30)].map((_, i) => {
-            return (
-              <Grid item xs>
-                <SkeletonCard key={i} />
-              </Grid>
-            );
-          })
-        }
-        {
-          userSubmissionsList.map((sub, i) => {
-            return (
-              <Grid item xs>
-                <SubmissionCard submissionInfo={sub} imageUrl={imagesList[i]} />
-              </Grid>
-            );
-          })
-        }
-      </Grid>
-    </div>
+    <Grid container direction={windowWidth >= 960 ? 'row' : 'column'} spacing={2}>
+      {
+        (!userSubmissionsList || !userSubmissionsList.length) &&
+        [...Array(30)].map((_, i) => {
+          return (
+            <Grid item xs>
+              <SkeletonCard key={i} />
+            </Grid>
+          );
+        })
+      }
+      {
+        userSubmissionsList.map((sub, i) => {
+          return (
+            <Grid item xs>
+              <SubmissionCard submissionInfo={sub} imageUrl={imagesList[i]} />
+            </Grid>
+          );
+        })
+      }
+    </Grid>
   );
 }
 

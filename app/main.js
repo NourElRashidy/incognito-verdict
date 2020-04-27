@@ -10,7 +10,9 @@ function createWindow() {
       nodeIntegration: true,
       devTools: true
     },
-    resizable: true
+    resizable: true,
+    minWidth: 600,
+    minHeight: 685
   });
 
   mainWindow.maximize();
@@ -42,6 +44,5 @@ app.on('activate', function () {
 
 require('./controllers/CodeforcesController');
 require('./controllers/ImagesEngineController');
-
 
 require('./engines/ImagesEngine').loadAllImages();

@@ -16,7 +16,7 @@ export const ArenaProvider = ({ children }) => {
     const [currentProblemStatementHTML, setCurrentProblemStatementHTML] = useState(null);
     const [currentProblemStatementPdfLink, setCurrentProblemStatementPdfLink] = useState(null);
     const [pdfViewerSettings, setPdfViewerSettings] = useState({ scale: 1.5, pageIndex: 0 });
-    const resetPdfViewerSettings = () => setViewerPdfSettings({ scale: 1.5, pageIndex: 0 });
+    const resetPdfViewerSettings = () => setPdfViewerSettings({ scale: 1.5, pageIndex: 0 });
     const [availableSubmitLanguagesList, setAvailableSubmitLanguagesList] = useState([]);
 
     const [userSourceCode, setUserSourceCode] = useState('');

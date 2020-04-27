@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1)
   },
   box: {
+    padding: 14,
     position: 'relative',
     '&:not(:last-of-type)': {
       '&:after': {

@@ -1,18 +1,21 @@
 const { ipcRenderer } = window.require('electron');
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { useArenaStore } from '../stores/ArenaStore'
+import { useArenaStore } from '../stores/ArenaStore';
+import useWindowDimensions from '../hooks/useWindowDimensions';
 
 import SplashScreen from '../components/SplashScreen';
 import SubmitForm from '../components/SubmitForm';
 import ProblemStatement from '../components/ProblemStatement';
 import SubmissionsList from '../components/SubmissionsList';
+import TabPanel from '../components/TabPanel';
 
 import { Toolbar, Tabs, Tab, Drawer, Chip, TextField, Button, Snackbar } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 import { makeStyles } from '@material-ui/core/styles';
 
-let drawerWidth = 575;
+const wideDrawerWidth = 575;
+const narrowDrawerWidth = 275;
+const bottomDrawerHeight = 331;
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -22,8 +25,21 @@ const useStyles = makeStyles((theme) => ({
     width: '100%'
   },
   arenaContainer: {
-    maxWidth: `calc(100% - ${drawerWidth + 25}px)`,
-    height: '100%',
+    [theme.breakpoints.between('xs', 'md')]: {
+      maxWidth: `100%`,
+      maxHeight: `calc(100% - ${bottomDrawerHeight + 20}px)`,
+      overflowX: 'auto',
+    },
+    [theme.breakpoints.between('md', 'lg')]: {
+      maxWidth: `calc(100% - ${narrowDrawerWidth + 25}px)`,
+      maxHeight: `100%`,
+      height: `100%`,
+    },
+    [theme.breakpoints.up('lg')]: {
+      maxWidth: `calc(100% - ${wideDrawerWidth + 25}px)`,
+      maxHeight: `100%`,
+      height: `100%`,
+    },
     padding: 0,
   },
   tabs: {
@@ -31,8 +47,14 @@ const useStyles = makeStyles((theme) => ({
     flexShrink: 0,
   },
   mainTab: {
+    [theme.breakpoints.between('xs', 'md')]: {
+      height: 'calc(100% - 65px)',
+    },
+    [theme.breakpoints.up('md')]: {
+      height: `100%`,
+    },
+    maxHeight: '-webkit-fill-available',
     display: 'flex',
-    height: '94%',
     flexShrink: 1,
     justifyContent: 'center',
   },
@@ -49,17 +71,24 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: 12,
     fontSize: '0.975rem',
   },
-  drawer: {
-    [theme.breakpoints.up('sm')]: {
-      width: drawerWidth,
+  sideDrawer: {
+    [theme.breakpoints.up('md')]: {
+      width: wideDrawerWidth,
       flexShrink: 0,
     },
-    [theme.breakpoints.down('xs')]: {
-      width: 300,
+    [theme.breakpoints.down('md')]: {
+      width: narrowDrawerWidth,
       flexShrink: 0,
     },
     background: '#eceff1',
-    padding: '15px'
+    padding: 15
+  },
+  bottomDrawer: {
+    height: bottomDrawerHeight,
+    background: '#eceff1',
+    display: 'flex',
+    flexDirection: 'row',
+    padding: 15
   },
   urlInput: {
     display: 'flex',
@@ -90,6 +119,7 @@ const Arena = () => {
   const [iserrorAlertActive, setIsErrorAlertActive] = useState(false);
   const [errorAlertMessage, setErrorAlertMessage] = useState('');
 
+  const { windowWidth } = useWindowDimensions();
   const classes = useStyles();
 
   const onKeyPress = (e) => {
@@ -103,6 +133,12 @@ const Arena = () => {
       e.preventDefault();
     }
   }
+
+  useEffect(() => {
+    if (currentProblemURL !== '') {
+      startProblem();
+    }
+  }, [currentProblemURL]);
 
   const handleSubmit = () => {
     if (inputURL === '') {
@@ -139,12 +175,6 @@ const Arena = () => {
       setErrorAlertMessage('');
     }
   };
-
-  useEffect(() => {
-    if (currentProblemURL !== '') {
-      startProblem();
-    }
-  }, [currentProblemURL]);
 
   const requestProblemName = () => {
     ipcRenderer.send('get-problem-name', currentProblemURL);
@@ -277,31 +307,14 @@ const Arena = () => {
       <Drawer
         variant="permanent"
         classes={{
-          paper: classes.drawer,
+          paper: windowWidth >= 960 ? classes.sideDrawer : classes.bottomDrawer,
         }}
-        anchor="right"
+        anchor={windowWidth >= 960 ? 'right' : 'bottom'}
       >
         <SubmissionsList />
       </Drawer>
     </>
   );
 }
-
-const TabPanel = ({ children, currentTab, tabIndex, className }) => {
-  return (
-    <>
-      {
-        (currentTab === tabIndex) &&
-        <div className={className}>{children}</div>
-      }
-    </>
-  );
-}
-
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  currentTab: PropTypes.any.isRequired,
-  tabIndex: PropTypes.any.isRequired,
-};
 
 export default Arena;
