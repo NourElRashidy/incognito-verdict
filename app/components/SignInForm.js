@@ -1,8 +1,8 @@
 const { ipcRenderer, shell } = window.require('electron');
 import React, { useState } from 'react';
 
-import { Box, Button, Link, TextField, Typography, LinearProgress } from '@material-ui/core';
-import { Alert, AlertTitle } from '@material-ui/lab';
+import { Box, Button, Link, TextField, Typography, LinearProgress, Divider } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
@@ -31,23 +31,24 @@ const Disclaimer = () => {
   const REPO_LINK = 'https://github.com/NourElRashidy/incognito-verdict';
   return (
     <Alert variant="outlined" severity="info">
-      <AlertTitle>Disclaimer</AlertTitle>
-      Your username and password are only used to login to codeforces.
-      They are not sent to any remote servers other than codeforces.
-      They are not stored anywhere not even on your local machine. <br /> <br />
-      The&nbsp;
+      <div style={{ color: '#546e7a' }} >
+        Your username and password are only used to login to codeforces.
+        They are not sent to any remote servers other than codeforces.
+        They are not stored anywhere not even on your local machine. <br /> <br />
+        The&nbsp;
         <Link
-        color="primary"
-        underline="always"
-        href={REPO_LINK}
-        onClick={(e) => {
-          e.preventDefault();
-          shell.openExternal(e.target.href);
-        }}
-      >
-        source code
-      </Link>
-      &nbsp;is available, feel free to take a look.
+          color="primary"
+          underline="always"
+          href={REPO_LINK}
+          onClick={(e) => {
+            e.preventDefault();
+            shell.openExternal(e.target.href);
+          }}
+        >source code</Link>
+        &nbsp;is available, feel free to take a look.
+      <Divider style={{ margin: 15 }} />
+        All rights belong to their respective owners. Thank you Mike Mirzayanov for the great Codeforces platform. Images belong to ICPCNews.
+        </div>
     </Alert>
   );
 }
