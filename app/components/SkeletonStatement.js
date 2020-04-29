@@ -2,8 +2,6 @@ import React from 'react';
 import { randomIntInRange } from '../services/Utils'
 import Skeleton from '@material-ui/lab/Skeleton';
 
-import '../assets/codeforces.css';
-
 const SkeletonStatement = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
@@ -33,6 +31,5 @@ const SkeletonStatement = () => {
     </div>
   );
 }
-
 
 export default SkeletonStatement;

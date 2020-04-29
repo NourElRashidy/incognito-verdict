@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useArenaStore } from '../stores/ArenaStore'
 
-import '../assets/codeforces.css';
+import '../styles/codeforces.css';
 
 const HtmlStatement = () => {
   const { currentProblemStatementHTML } = useArenaStore();

@@ -3,29 +3,8 @@ import React, { useState } from 'react';
 
 import { Box, Button, Link, TextField, Typography, LinearProgress, Divider } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
-import { makeStyles } from '@material-ui/core/styles';
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    margin: theme.spacing(-10, 4),
-    marginBottom: 10,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    height: 'fit-content'
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: '100%',
-    marginTop: theme.spacing(1),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  }
-}));
+import useSignInFormStyles from '../styles/useSignInFormStyles';
 
 const Disclaimer = () => {
   const REPO_LINK = 'https://github.com/NourElRashidy/incognito-verdict';
@@ -47,7 +26,7 @@ const Disclaimer = () => {
         >source code</Link>
         &nbsp;is available, feel free to take a look.
       <Divider style={{ margin: 15 }} />
-        All rights belong to their respective owners. Thank you Mike Mirzayanov for the great Codeforces platform. Images belong to ICPCNews.
+        All rights belong to their respective owners. Thank you Mike Mirzayanov for the great Codeforces platform. Images belong to ICPCNews & ACPC.
         </div>
     </Alert>
   );
@@ -60,7 +39,7 @@ const SignInForm = ({ isSessionExpired }) => {
   const [errorMessage, setErrorMessage] = useState(isSessionExpired ? 'Session expired, please sign in again.' : null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const classes = useStyles();
+  const styles = useSignInFormStyles();
 
   const onEnterPress = (ev) => {
     if (ev.key === 'Enter') {
@@ -85,11 +64,11 @@ const SignInForm = ({ isSessionExpired }) => {
   }
 
   return (
-    <div className={classes.paper}>
+    <div className={styles.signInContainer}>
       <Typography component="h1" variant="h5" color="textSecondary">
         sign in to codeforces
       </Typography>
-      <div className={classes.form}>
+      <div className={styles.formContainer}>
         <TextField
           variant="outlined"
           margin="normal"
@@ -128,7 +107,7 @@ const SignInForm = ({ isSessionExpired }) => {
           fullWidth
           variant="contained"
           color="primary"
-          className={classes.submit}
+          className={styles.submitButton}
           onClick={handleSubmit}
         >
           Sign In
@@ -138,7 +117,7 @@ const SignInForm = ({ isSessionExpired }) => {
           <Alert variant="outlined" severity="error">{errorMessage}</Alert>
         }
       </div>
-      <Box mt={5} className={classes.disclaimer} >
+      <Box mt={5} >
         <Disclaimer />
       </Box>
     </div>

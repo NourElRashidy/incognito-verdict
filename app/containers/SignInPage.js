@@ -2,44 +2,18 @@ import React from 'react';
 import SignInForm from '../components/SignInForm';
 import { Grid, Paper, Avatar, CssBaseline } from '@material-ui/core';
 
-import { makeStyles } from '@material-ui/core/styles';
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    height: '100vh',
-  },
-  icon: {
-    display: 'grid',
-  },
-  image: {
-    backgroundImage: 'url(./data/assets/bg.jpg)',
-    backgroundRepeat: 'no-repeat',
-    backgroundColor: theme.palette.grey[50],
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-  },
-  avatar: {
-    alignSelf: 'center',
-    justifySelf: 'center',
-    width: theme.spacing(60),
-    height: theme.spacing(60),
-    marginLeft: -30
-  },
-  form: {
-    paddingTop: -50
-  }
-}));
+import useSignInPageStyles from '../styles/useSignInPageStyles';
 
 const SignInPage = ({ isSessionExpired }) => {
-  const classes = useStyles();
+  const styles = useSignInPageStyles();
 
   return (
-    <Grid container component="main" className={classes.root}>
+    <Grid container component="main" className={styles.pageContainer}>
       <CssBaseline />
-      <Grid item xs={false} sm={4} md={7} className={classes.image} />
-      <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-        <div className={classes.icon}>
-          <Avatar src="./data/assets/icons/icon-transparent.png" className={classes.avatar} />
+      <Grid item xs={false} sm={4} md={7} className={styles.sideImage} />
+      <Grid item xs={12} sm={8} md={5} component={Paper} square>
+        <div className={styles.iconContainer}>
+          <Avatar src="./data/assets/icons/icon-transparent.png" className={styles.icon} />
         </div>
         <SignInForm isSessionExpired={isSessionExpired} />
       </Grid>

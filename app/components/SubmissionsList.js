@@ -16,32 +16,27 @@ const verdictMapping = (verdict) => {
     case 'TESTING':
       return {
         text: 'Pending',
-        cardStyle: 'greyCard',
-        textStyle: 'lightText'
+        cardStyle: 'verdictPending',
       };
     case 'OK':
       return {
         text: 'Accepted',
-        cardStyle: 'greenCard',
-        textStyle: 'lightText'
+        cardStyle: 'verdictAccepted',
       };
     case 'WRONG_ANSWER':
       return {
         text: 'Wrong Answer',
-        cardStyle: 'redCard',
-        textStyle: 'lightText'
+        cardStyle: 'verdictWA',
       };
     case 'TIME_LIMIT_EXCEEDED':
       return {
         text: 'Time Limit Exceeded',
-        cardStyle: 'blueCard',
-        textStyle: 'lightText'
+        cardStyle: 'verdictTLE',
       };
     default:
       return {
         text: verdict.toLowerCase().split('_').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' '),
-        cardStyle: 'yellowCard',
-        textStyle: 'darkText'
+        cardStyle: 'verdictOther',
       };
   }
 }

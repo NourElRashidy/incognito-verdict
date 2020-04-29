@@ -4,22 +4,14 @@ import SkeletonStatement from './SkeletonStatement';
 import HtmlStatement from './HtmlStatement';
 import PdfStatement from './PdfStatement';
 
-import { makeStyles } from '@material-ui/core/styles';
-
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    width: '95%',
-    margin: 15,
-    display: 'flex'
-  }
-}));
+import useProblemStatementStyles from '../styles/useProblemStatementStyles';
 
 const ProblemStatement = () => {
-  const classes = useStyles();
+  const styles = useProblemStatementStyles();
   const { currentProblemStatementType } = useArenaStore();
 
   return (
-    <div className={classes.paper}>
+    <div className={styles.problemStatementContainer}>
       {
         !currentProblemStatementType &&
         <SkeletonStatement />

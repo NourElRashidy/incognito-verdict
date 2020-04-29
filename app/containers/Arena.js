@@ -11,95 +11,7 @@ import TabPanel from '../components/TabPanel';
 
 import { Toolbar, Tabs, Tab, Drawer, Chip, TextField, Button, Snackbar } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
-import { makeStyles } from '@material-ui/core/styles';
-
-const wideDrawerWidth = 575;
-const narrowDrawerWidth = 275;
-const bottomDrawerHeight = 331;
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.paper,
-    display: 'flex',
-    height: '100%',
-    width: '100%'
-  },
-  arenaContainer: {
-    [theme.breakpoints.between('xs', 'md')]: {
-      maxWidth: `100%`,
-      maxHeight: `calc(100% - ${bottomDrawerHeight + 20}px)`,
-      overflowX: 'auto',
-    },
-    [theme.breakpoints.between('md', 'lg')]: {
-      maxWidth: `calc(100% - ${narrowDrawerWidth + 25}px)`,
-      maxHeight: `100%`,
-      height: `100%`,
-    },
-    [theme.breakpoints.up('lg')]: {
-      maxWidth: `calc(100% - ${wideDrawerWidth + 25}px)`,
-      maxHeight: `100%`,
-      height: `100%`,
-    },
-    padding: 0,
-  },
-  tabs: {
-    borderRight: `1px solid ${theme.palette.divider}`,
-    flexShrink: 0,
-  },
-  mainTab: {
-    [theme.breakpoints.between('xs', 'md')]: {
-      height: 'calc(100% - 65px)',
-    },
-    [theme.breakpoints.up('md')]: {
-      height: `100%`,
-    },
-    maxHeight: '-webkit-fill-available',
-    display: 'flex',
-    flexShrink: 1,
-    justifyContent: 'center',
-  },
-  toolbar: theme.mixins.toolbar,
-  appbar: {
-    background: 'white',
-    width: '100%',
-    padding: 0,
-
-  },
-  nameChip: {
-    marginRight: 25,
-    height: 50,
-    borderRadius: 12,
-    fontSize: '0.975rem',
-  },
-  sideDrawer: {
-    [theme.breakpoints.up('md')]: {
-      width: wideDrawerWidth,
-      flexShrink: 0,
-    },
-    [theme.breakpoints.down('md')]: {
-      width: narrowDrawerWidth,
-      flexShrink: 0,
-    },
-    background: '#eceff1',
-    padding: 15
-  },
-  bottomDrawer: {
-    height: bottomDrawerHeight,
-    background: '#eceff1',
-    display: 'flex',
-    flexDirection: 'row',
-    padding: 15
-  },
-  urlInput: {
-    display: 'flex',
-    flexDirection: 'row',
-    width: '100%',
-  },
-  submit: {
-    height: 45,
-    margin: '20px 15px 15px',
-  }
-}));
+import useArenaStyles from '../styles/useArenaStyles';
 
 const Arena = () => {
   const {
@@ -120,7 +32,7 @@ const Arena = () => {
   const [errorAlertMessage, setErrorAlertMessage] = useState('');
 
   const { windowWidth } = useWindowDimensions();
-  const classes = useStyles();
+  const styles = useArenaStyles();
 
   const onKeyPress = (e) => {
     if (e.keyCode === 27 && e.target.name === 'problemURL' && currentProblemURL !== '') { // Escape key
@@ -225,11 +137,11 @@ const Arena = () => {
 
   return (
     <>
-      <div className={classes.arenaContainer}>
-        <Toolbar className={classes.toolbar}>
+      <div className={styles.arenaContainer}>
+        <Toolbar className={styles.toolbar}>
           {
             isWaitingForURLInput &&
-            <div className={classes.urlInput}>
+            <div className={styles.urlForm}>
               <TextField
                 ref={input => {
                   if (input != null)
@@ -254,7 +166,7 @@ const Arena = () => {
                 type="submit"
                 variant="contained"
                 color="primary"
-                className={classes.submit}
+                className={styles.submitButton}
                 onClick={handleSubmit}
               >
                 Start
@@ -264,7 +176,12 @@ const Arena = () => {
           {
             !isWaitingForURLInput &&
             <>
-              <Chip label={currentproblemName} onDelete={e => setIsWaitingForURLInput(true)} color="primary" className={classes.nameChip} />
+              <Chip
+                label={currentproblemName}
+                color="primary"
+                className={styles.problemName}
+                onDelete={e => setIsWaitingForURLInput(true)}
+              />
               <Tabs
                 variant="scrollable"
                 indicatorColor="primary"
@@ -285,11 +202,11 @@ const Arena = () => {
         {
           !isWaitingForURLInput &&
           <>
-            <TabPanel currentTab={currentTab} tabIndex={0} className={classes.mainTab}>
+            <TabPanel currentTab={currentTab} tabIndex={0} className={styles.tabPanel}>
               <ProblemStatement />
             </TabPanel>
 
-            <TabPanel currentTab={currentTab} tabIndex={1} className={classes.mainTab}>
+            <TabPanel currentTab={currentTab} tabIndex={1} className={styles.tabPanel}>
               <SubmitForm />
             </TabPanel>
           </>
@@ -307,7 +224,7 @@ const Arena = () => {
       <Drawer
         variant="permanent"
         classes={{
-          paper: windowWidth >= 960 ? classes.sideDrawer : classes.bottomDrawer,
+          paper: windowWidth >= 960 ? styles.sideDrawer : styles.bottomDrawer,
         }}
         anchor={windowWidth >= 960 ? 'right' : 'bottom'}
       >
