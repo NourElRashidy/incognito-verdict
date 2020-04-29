@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useArenaStore } from '../stores/ArenaStore'
 
 import '../assets/codeforces.css';
 
 const HtmlStatement = () => {
   const { currentProblemStatementHTML } = useArenaStore();
+
+  useEffect(() => {
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+  }, []);
 
   return (
     <div dangerouslySetInnerHTML={{ __html: currentProblemStatementHTML }} />
