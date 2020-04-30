@@ -2,7 +2,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const wideDrawerWidth = 575;
 const narrowDrawerWidth = 275;
-const bottomDrawerHeight = 331;
+const bottomDrawerHeight = 190;
 
 const useArenaStyles = makeStyles((theme) => ({
   arenaContainer: {

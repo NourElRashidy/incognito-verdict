@@ -2,14 +2,40 @@ import { makeStyles } from '@material-ui/core/styles';
 
 export const useSubmissionCardStyles = makeStyles((theme) => ({
   submissionCard: {
+    [theme.breakpoints.between('xs', 'lg')]: {
+      width: 270
+    },
+    [theme.breakpoints.up('lg')]: {
+      width: 565,
+      height: 200,
+      display: 'flex',
+    },
     borderRadius: theme.spacing(1),
-    width: 270,
   },
   media: {
-    height: 160,
+    [theme.breakpoints.between('xs', 'md')]: {
+      height: 0,
+    },
+    [theme.breakpoints.between('md', 'lg')]: {
+      height: 160,
+    },
+    [theme.breakpoints.up('lg')]: {
+      width: '50%',
+      minWidth: '50%',
+      height: '100%',
+    },
   },
   content: {
-
+    [theme.breakpoints.between('xs', 'lg')]: {
+      marginBottom: -15,
+    },
+    [theme.breakpoints.up('lg')]: {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      height: '90%',
+      width: '100%',
+    },
   },
   verdictCard: {
     display: 'block',
@@ -46,13 +72,25 @@ export const useSubmissionCardStyles = makeStyles((theme) => ({
     paddingTop: 5
   },
   footer: {
-
+    [theme.breakpoints.between('xs', 'lg')]: {
+      marginTop: 25,
+    },
+    [theme.breakpoints.up('lg')]: {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+    },
   },
   date: {
     marginTop: theme.spacing(1)
   },
   infoBox: {
-    padding: 14,
+    [theme.breakpoints.between('xs', 'lg')]: {
+      padding: 9,
+    },
+    [theme.breakpoints.up('lg')]: {
+      padding: '16px 11px',
+    },
     position: 'relative',
     '&:not(:last-of-type)': {
       '&:after': {
@@ -71,12 +109,41 @@ export const useSubmissionCardStyles = makeStyles((theme) => ({
 }));
 
 export const useSkeletonCardStyles = makeStyles((theme) => ({
-  media: {
-    height: 160,
-  },
   skeletonCard: {
+    [theme.breakpoints.between('xs', 'lg')]: {
+      width: 270,
+    },
+    [theme.breakpoints.up('lg')]: {
+      width: 565,
+      height: 200,
+      display: 'flex',
+    },
     borderRadius: theme.spacing(1),
-    width: 270,
-    height: 325
-  }
+  },
+  media: {
+    [theme.breakpoints.between('xs', 'md')]: {
+      height: 0,
+    },
+    [theme.breakpoints.between('md', 'lg')]: {
+      height: 160,
+    },
+    [theme.breakpoints.up('lg')]: {
+      width: '50%',
+      minWidth: '50%',
+      height: '100%',
+    },
+  },
+  content: {
+    [theme.breakpoints.between('xs', 'lg')]: {
+      height: 180,
+    },
+    [theme.breakpoints.up('lg')]: {
+      width: '50%',
+      minWidth: '50%',
+      height: '100%',
+    },
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-evenly',
+  },
 }));

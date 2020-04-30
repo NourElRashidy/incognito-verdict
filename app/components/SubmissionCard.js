@@ -12,7 +12,7 @@ const SubmissionCard = ({ submissionInfo, imageUrl }) => {
     <Card key={submissionInfo.id} className={styles.submissionCard}>
       <CardActionArea className={styles.media}>
         <CardMedia
-          style={{ height: 160 }}
+          style={{ height: '100%' }}
           image={imageUrl}
           onClick={(e) => {
             e.preventDefault();
@@ -27,24 +27,24 @@ const SubmissionCard = ({ submissionInfo, imageUrl }) => {
             {submissionInfo.verdict.text}
           </Typography>
         </Card>
+        <div className={styles.footer}>
+          <Divider variant="middle" />
+          <Box display={'block'} className={styles.date}>
+            <Typography variant="body2" align='center'>{submissionInfo.dateTime}</Typography>
+          </Box>
+          <Box display={'flex'}>
+            <Box p={2} flex={'auto'} className={styles.infoBox}>
+              <Typography variant="body2" align='center'>{submissionInfo.id}</Typography>
+            </Box>
+            <Box p={2} flex={'auto'} className={styles.infoBox}>
+              <Typography variant="body2" align='center'>{submissionInfo.timeConsumed}</Typography>
+            </Box>
+            <Box p={2} flex={'auto'} className={styles.infoBox}>
+              <Typography variant="body2" align='center'>{submissionInfo.memoryConsumed}</Typography>
+            </Box>
+          </Box>
+        </div>
       </CardContent>
-      <div className={styles.footer}>
-        <Divider variant="middle" />
-        <Box display={'block'} className={styles.date}>
-          <Typography variant="body2" align='center'>{submissionInfo.dateTime}</Typography>
-        </Box>
-        <Box display={'flex'}>
-          <Box p={2} flex={'auto'} className={styles.infoBox}>
-            <Typography variant="body2" align='center'>{submissionInfo.id}</Typography>
-          </Box>
-          <Box p={2} flex={'auto'} className={styles.infoBox}>
-            <Typography variant="body2" align='center'>{submissionInfo.timeConsumed}</Typography>
-          </Box>
-          <Box p={2} flex={'auto'} className={styles.infoBox}>
-            <Typography variant="body2" align='center'>{submissionInfo.memoryConsumed}</Typography>
-          </Box>
-        </Box>
-      </div>
     </Card>
   );
 }
