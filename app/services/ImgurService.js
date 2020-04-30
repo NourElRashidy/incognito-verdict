@@ -2,7 +2,7 @@ const scraper = require('../engines/ScrapingEngine');
 const { clientId, albumHash } = require('../configs/imgurConfigs');
 
 module.exports = {
-    fetchAllImages: async () => {
+    fetchimagesGallery: async () => {
         const url = `https://api.imgur.com/3/album/${albumHash}/images`;
         const page = await scraper.getNewPage();
 

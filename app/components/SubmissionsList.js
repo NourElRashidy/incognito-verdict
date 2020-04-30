@@ -47,13 +47,13 @@ const SubmissionsList = () => {
     userSubmissionsList, setUserSubmissionsList
   } = useArenaStore();
 
-  const [imagesList, setImagesList] = useState([]);
+  const [imagesWindow, setImagesWindow] = useState([]);
   const { windowWidth } = useWindowDimensions();
 
   const updateSubmissions = (subs) => {
-    ipcRenderer.send('get-images-window', subs.length);
+    ipcRenderer.send('get-images-window', subs.map(s => s.id));
     ipcRenderer.once('images-window', (_, imgs) => {
-      setImagesList(imgs);
+      setImagesWindow(imgs);
       setUserSubmissionsList(subs);
     });
   }
@@ -103,10 +103,10 @@ const SubmissionsList = () => {
         })
       }
       {
-        userSubmissionsList.map((sub, i) => {
+        userSubmissionsList.map(sub => {
           return (
             <Grid item xs>
-              <SubmissionCard submissionInfo={sub} imageUrl={imagesList[i]} />
+              <SubmissionCard submissionInfo={sub} imageUrl={imagesWindow[sub.id]} />
             </Grid>
           );
         })

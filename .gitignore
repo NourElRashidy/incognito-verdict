@@ -133,3 +133,4 @@ sketch
 data/assets
 
 *.png
+data/meta/cached-imgs-window.json

@@ -1,15 +1,11 @@
 const { ipcMain } = require('electron');
-const { getImagesWindow, shiftImagesWindow } = require('../engines/ImagesEngine');
+const { getImagesWindow } = require('../engines/ImagesEngine');
 
-ipcMain.on('get-images-window', async (event, size) => {
+ipcMain.on('get-images-window', async (event, submissionIds) => {
     try {
-        event.sender.send('images-window', await getImagesWindow(size));
+        event.sender.send('images-window', await getImagesWindow(submissionIds));
     }
     catch (e) {
         event.sender.send('images-window');
     }
-});
-
-ipcMain.on('shift-images-window', _ => {
-    shiftImagesWindow();
 });
