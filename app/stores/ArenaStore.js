@@ -12,6 +12,7 @@ export const ArenaProvider = ({ children }) => {
 
     const [currentProblemURL, setCurrentProblemURL] = useState('');
     const [currentproblemName, setCurrentProblemName] = useState('');
+    const [currentProblemLimitsAndIO, setCurrentProblemLimitsAndIO] = useState(null);
     const [currentProblemStatementType, setCurrentProblemStatementType] = useState(null);
     const [currentProblemStatementHTML, setCurrentProblemStatementHTML] = useState(null);
     const [currentProblemStatementPdfLink, setCurrentProblemStatementPdfLink] = useState(null);
@@ -29,10 +30,11 @@ export const ArenaProvider = ({ children }) => {
         pendingSubmissionsCount, setPendingSubmissionsCount, incrementPendingSubmissionsCount,
         userSubmissionsList, setUserSubmissionsList,
         currentProblemURL, setCurrentProblemURL,
+        currentproblemName, setCurrentProblemName,
+        currentProblemLimitsAndIO, setCurrentProblemLimitsAndIO,
         currentProblemStatementType, setCurrentProblemStatementType,
         currentProblemStatementHTML, setCurrentProblemStatementHTML,
         currentProblemStatementPdfLink, setCurrentProblemStatementPdfLink,
-        currentproblemName, setCurrentProblemName,
         pdfViewerSettings, setPdfViewerSettings, resetPdfViewerSettings,
         availableSubmitLanguagesList, setAvailableSubmitLanguagesList,
         userSourceCode, setUserSourceCode,

@@ -43,7 +43,18 @@ ipcMain.on('get-available-languages', async (event, problemURL) => {
         event.sender.send('available-languages', await codeforces.getAvailableLanguages(problemURL));
     }
     catch (e) {
-        event.sender.send('available-languages', e.message);
+        event.sender.send('available-languages');
+    }
+});
+
+ipcMain.on('get-limits-io', async (event, problemURL) => {
+    try {
+        event.sender.send('limits-io', await codeforces.getProblemLimitsAndIO(problemURL));
+    }
+    catch (e) {
+        console.log(e);
+
+        event.sender.send('limits-io');
     }
 });
 

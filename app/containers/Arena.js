@@ -17,6 +17,7 @@ const Arena = () => {
   const {
     currentProblemURL, setCurrentProblemURL,
     currentproblemName, setCurrentProblemName,
+    setCurrentProblemLimitsAndIO,
     availableSubmitLanguagesList, setAvailableSubmitLanguagesList,
     setCurrentProblemStatementType,
     setCurrentProblemStatementHTML,
@@ -129,10 +130,23 @@ const Arena = () => {
     });
   }
 
+  const requestLimitsAndIO = () => {
+    ipcRenderer.send('get-limits-io', currentProblemURL);
+    ipcRenderer.once('limits-io', (_, limitsAndIO) => {
+      if (!limitsAndIO) {
+        setErrorAlertMessage('Failed to retrieve problem limits and io info. Please check on the problem submit page.');
+        setIsErrorAlertActive(true);
+        return;
+      }
+      setCurrentProblemLimitsAndIO(limitsAndIO);
+    });
+  }
+
   const startProblem = () => {
     requestProblemName();
     requestProblemStatement();
     requestAvailableSubmitLanguages();
+    requestLimitsAndIO();
   }
 
   return (

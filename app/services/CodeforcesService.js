@@ -160,6 +160,23 @@ const submitProblem = async (url, languageId, sourceCode) => {
     });
 }
 
+const PROBLEM_IO_SELECTOR = '#submittedProblemFiles';
+const PROBLEM_LIMITS_SELECTOR = '#submittedProblemLimits';
+const getProblemLimitsAndIO = async (url) => {
+    const page = await scraper.getNewPage(cookies);
+    url = await getSubmitUrl(url);
+    try {
+        await page.goto(url);
+        const io = await page.$eval(PROBLEM_IO_SELECTOR, el => el.innerText);
+        const limits = await page.$eval(PROBLEM_LIMITS_SELECTOR, el => el.innerText);
+        return { io, limits };
+    }
+    catch (e) {
+        scraper.closePage(page);
+        throw e;
+    }
+}
+
 const getAvailableLanguages = async (url) => {
     try {
         return await require('../engines/FilesEngine').loadLanguages();
@@ -248,14 +265,14 @@ const getProblemName = async (url) => {
 
 const PROBLEM_STATEMENT_SELECTOR = '#pageContent > div.problemindexholder';
 const COPY_BUTTONS_SELECTOR = '.input-output-copier';
-const ATTAHMENTS_TABLE_SELECTOR = '#pageContent > div.datatable > div:nth-child(6) > table';
+const ATTACHMENTS_TABLE_SELECTOR = '#pageContent > div.datatable > div:nth-child(6) > table';
 const getProblemStatement = async (url) => {
     const page = await scraper.getNewPage();
     const response = await page.goto(url);
     await page.setContent(await response.text());
     try {
         if (response.url().includes('attachments')) {
-            const englishPdfLink = await page.$eval(ATTAHMENTS_TABLE_SELECTOR, (table) => {
+            const englishPdfLink = await page.$eval(ATTACHMENTS_TABLE_SELECTOR, (table) => {
                 for (var i = 0, row; row = table.rows[i]; i++)
                     if (row.cells[1].innerText.includes('English'))
                         return row.cells[2].querySelector('a').href;
@@ -270,6 +287,7 @@ const getProblemStatement = async (url) => {
                 }
                 return el.innerHTML;
             }, COPY_BUTTONS_SELECTOR);
+
             scraper.closePage(page);
             return { type: 'HTML', statement };
         }
@@ -286,6 +304,7 @@ module.exports = {
     closeRunningSession,
     submitProblem,
     getAvailableLanguages,
+    getProblemLimitsAndIO,
     getUserSubmissions,
     getProblemName,
     getProblemStatement,

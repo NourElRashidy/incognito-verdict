@@ -1,14 +1,19 @@
 import React from 'react';
 import { useArenaStore } from '../stores/ArenaStore'
+import { Alert } from '@material-ui/lab';
 import Viewer, { Worker, defaultLayout } from '@phuocng/react-pdf-viewer';
 
 import '@phuocng/react-pdf-viewer/cjs/react-pdf-viewer.css';
+import usePdfStatementStyles from '../styles/usePdfStatementStyles';
 
 const PdfStatement = () => {
   const {
     currentProblemStatementPdfLink,
-    pdfViewerSettings, setPdfViewerSettings
+    pdfViewerSettings, setPdfViewerSettings,
+    currentProblemLimitsAndIO,
   } = useArenaStore();
+
+  const styles = usePdfStatementStyles();
 
   const renderToolbar = (toolbarSlot) => {
     if (toolbarSlot.currentPage !== pdfViewerSettings.pageIndex)
@@ -54,17 +59,25 @@ const PdfStatement = () => {
   };
 
   return (
-    <Worker workerUrl="./lib/pdfjs/build/pdf.worker.min.js">
-      <div style={{ width: '100%' }}>
-        <Viewer
-          fileUrl={currentProblemStatementPdfLink}
-          initialPage={pdfViewerSettings.pageIndex}
-          defaultScale={pdfViewerSettings.scale}
-          layout={minifiedlayout}
-          onZoom={(_, scale) => setPdfViewerSettings({ ...pdfViewerSettings, scale })}
-        />
-      </div>
-    </Worker>
+    <div className={styles.mainContainer}>
+      {
+        currentProblemLimitsAndIO &&
+        <Alert severity="info" className={styles.infoBar}>
+          IO info: <strong>{currentProblemLimitsAndIO.io}</strong>, Limits: <strong>{currentProblemLimitsAndIO.limits}</strong>
+        </Alert>
+      }
+      <Worker workerUrl="./lib/pdfjs/build/pdf.worker.min.js">
+        <div className={styles.pdfViewer}>
+          <Viewer
+            fileUrl={currentProblemStatementPdfLink}
+            initialPage={pdfViewerSettings.pageIndex}
+            defaultScale={pdfViewerSettings.scale}
+            layout={minifiedlayout}
+            onZoom={(_, scale) => setPdfViewerSettings({ ...pdfViewerSettings, scale })}
+          />
+        </div>
+      </Worker>
+    </div>
   );
 }
 
